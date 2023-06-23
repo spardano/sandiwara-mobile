@@ -73,7 +73,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
   Widget commentChild(data) {
     return ListView(
       children: [
-        for (var item in commentList)
+        for (var item in commentList!)
           Padding(
             padding: const EdgeInsets.fromLTRB(2.0, 8.0, 2.0, 0.0),
             child: ListTile(
@@ -93,16 +93,16 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                   child: CircleAvatar(
                       radius: 50,
                       backgroundImage: CommentBox.commentImageParser(
-                          imageURLorPath: data[i]['pic'])),
+                          imageURLorPath: "assets/images/avatar.png")),
                 ),
               ),
               title: Text(
-                data[i]['nama_user'],
+                item.nama_user!,
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              subtitle: Text(data[i]['message']),
-              trailing: Text(data[i]['tanggal_comment'],
-                  style: TextStyle(fontSize: 10)),
+              subtitle: Text(item.message!),
+              trailing:
+                  Text(item.tanggal_comment!, style: TextStyle(fontSize: 10)),
             ),
           )
       ],
