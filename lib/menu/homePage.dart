@@ -105,29 +105,7 @@ class _homePageState extends State<homePage> {
         onMessageReceived: (JavascriptMessage message) {
           print(message);
           _doDirectToDetailPage(context, message.message);
-          // directToDetailPage(context, message.message);
-          // showAlertDialog(context, message.message);
         });
-  }
-
-  directToDetailPage(BuildContext context, String textData) {
-    final slug = jsonDecode(textData) as Map<String, dynamic>;
-    print(slug['slug_article']);
-
-    // Navigator.of(context).push(
-    //   PageRouteBuilder(
-    //       pageBuilder: (_, __, ___) => headerSliderDetail(
-    //             item: sampleItems[1],
-    //           ),
-    //       transitionDuration: Duration(milliseconds: 600),
-    //       transitionsBuilder:
-    //           (_, Animation<double> animation, __, Widget child) {
-    //         return Opacity(
-    //           opacity: animation.value,
-    //           child: child,
-    //         );
-    //       }),
-    // );
   }
 
   _doDirectToDetailPage(BuildContext context, String textData) {
@@ -140,25 +118,5 @@ class _homePageState extends State<homePage> {
     } catch (err) {
       print(err);
     }
-  }
-
-  showAlertDialog(BuildContext context, String text) {
-    Widget okButton = TextButton(
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-      child: Text("Ok"),
-    );
-    AlertDialog alert = AlertDialog(
-      title: Text("Webview App"),
-      content: Text(text),
-      actions: [okButton],
-    );
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        });
   }
 }

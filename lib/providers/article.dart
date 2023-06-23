@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/menu/news_header_slider_detail.dart';
+import 'package:sandiwara/models/commentArticle.dart';
 import 'package:sandiwara/models/detailArticle.dart';
 import 'package:sandiwara/models/newsHeaderModel.dart';
 
@@ -45,6 +46,32 @@ class Article with ChangeNotifier {
       }
     } catch (e) {
       print(e.toString());
+    }
+  }
+
+  Future<List<commentArticle>> getComments(int id_article) async {
+    List<commentArticle> commentList = [];
+    try {
+      var response = await http.post(
+          Uri.parse(apiUrl + '/guest/comments-article'),
+          body: {'id_article': id_article.toString()});
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body.toString());
+        print('status comments :' + data['status'].toString());
+
+        for (Map<String, dynamic> item in data['data']) {
+          commentList.add(commentArticle.fromJson(item));
+          print(item);
+        }
+
+        return commentList;
+      } else {
+        return commentList;
+      }
+    } catch (e) {
+      print(e.toString());
+      return commentList;
     }
   }
 }
