@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/providers/article.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:io' show Platform;
@@ -17,30 +20,12 @@ class trendingPage extends StatefulWidget {
 }
 
 class _trendingPageState extends State<trendingPage> {
-  final GlobalKey webViewKey = GlobalKey();
-  InAppWebViewController? webViewController;
-  late PullToRefreshController pullToRefreshController;
-  String url = mainUrl + '/webview/populer';
+  late WebViewController controller;
   double progress = 0;
-  final urlController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
-    pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
-        color: Colors.blue,
-      ),
-      onRefresh: () async {
-        if (Platform.isAndroid) {
-          webViewController?.reload();
-        } else if (Platform.isIOS) {
-          webViewController?.loadUrl(
-              urlRequest: URLRequest(url: await webViewController?.getUrl()));
-        }
-      },
-    );
   }
 
   @override
@@ -53,81 +38,37 @@ class _trendingPageState extends State<trendingPage> {
     return Scaffold(
       body: Stack(
         children: [
-          InAppWebView(
-            key: webViewKey,
+          WebView(
+            gestureNavigationEnabled: true,
+            initialUrl: mainUrl + '/webview/populer',
+            javascriptMode: JavascriptMode.unrestricted,
+            javascriptChannels:
+                <JavascriptChannel>[_jsDataCallback(context)].toSet(),
             gestureRecognizers: {
               Factory<VerticalDragGestureRecognizer>(
-                  () => VerticalDragGestureRecognizer())
+                  () => VerticalDragGestureRecognizer()
+                    ..onDown = (DragDownDetails dragDownDetails) {
+                      controller.getScrollY().then((value) {
+                        if (value == 0 &&
+                            dragDownDetails.globalPosition.direction < 1) {
+                          controller.reload();
+                        }
+                      });
+                    })
             },
-            initialUrlRequest:
-                URLRequest(url: Uri.parse(mainUrl + '/webview/populer')),
-            initialOptions: options,
-            pullToRefreshController: pullToRefreshController,
-            onWebViewCreated: (controller) {
-              webViewController = controller;
+            onPageStarted: (String url) {
+              setState(() {});
             },
-            onLoadStart: (controller, url) {
-              setState(() {
-                this.url = url.toString();
-                urlController.text = this.url;
-              });
-            },
-            androidOnPermissionRequest: (controller, origin, resources) async {
-              return PermissionRequestResponse(
-                  resources: resources,
-                  action: PermissionRequestResponseAction.GRANT);
-            },
-            shouldOverrideUrlLoading: (controller, navigationAction) async {
-              var uri = navigationAction.request.url!;
-
-              if (![
-                "http",
-                "https",
-                "file",
-                "chrome",
-                "data",
-                "javascript",
-                "about"
-              ].contains(uri.scheme)) {
-                if (await canLaunchUrl(Uri.parse(url))) {
-                  // Launch the App
-                  await launchUrl(
-                    Uri.parse(url),
-                  );
-                  // and cancel the request
-                  return NavigationActionPolicy.CANCEL;
-                }
-              }
-
-              return NavigationActionPolicy.ALLOW;
-            },
-            onLoadStop: (controller, url) async {
-              pullToRefreshController.endRefreshing();
-              setState(() {
-                this.url = url.toString();
-                urlController.text = this.url;
-              });
-            },
-            onLoadError: (controller, url, code, message) {
-              pullToRefreshController.endRefreshing();
-            },
-            onProgressChanged: (controller, progress) {
-              if (progress == 100) {
-                pullToRefreshController.endRefreshing();
-              }
+            onProgress: (progress) {
               setState(() {
                 this.progress = progress / 100;
-                urlController.text = this.url;
               });
             },
-            onUpdateVisitedHistory: (controller, url, androidIsReload) {
-              setState(() {
-                this.url = url.toString();
-                urlController.text = this.url;
-              });
+            onPageFinished: (String url) {
+              setState(() {});
             },
-            onConsoleMessage: (controller, consoleMessage) {
-              print(consoleMessage);
+            onWebViewCreated: (controller) {
+              this.controller = controller;
             },
           ),
           progress < 1.0
@@ -136,5 +77,26 @@ class _trendingPageState extends State<trendingPage> {
         ],
       ),
     );
+  }
+
+  JavascriptChannel _jsDataCallback(BuildContext context) {
+    return JavascriptChannel(
+        name: 'DataCallback',
+        onMessageReceived: (JavascriptMessage message) {
+          print(message);
+          _doDirectToDetailPage(context, message.message);
+        });
+  }
+
+  _doDirectToDetailPage(BuildContext context, String textData) {
+    final slug = jsonDecode(textData) as Map<String, dynamic>;
+    print(slug['slug_article']);
+
+    try {
+      Provider.of<Article>(context, listen: false)
+          .getDetailArtikel(context, slug['slug_article']);
+    } catch (err) {
+      print(err);
+    }
   }
 }

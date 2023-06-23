@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/providers/article.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class categoryBerita extends StatefulWidget {
@@ -57,18 +61,16 @@ class _categoryBeritaState extends State<categoryBerita> {
       body: Stack(
         children: [
           WebView(
-            // initialUrl: 'https://sandiwara.id/webview/home',
             initialUrl: mainUrl + '/webview/category',
             navigationDelegate: (NavigationRequest request) {
-              // if (request.url == 'https://sandiwara.id') {
-              //   return NavigationDecision.prevent;
-              // }
               if (request.url == mainUrl) {
                 return NavigationDecision.prevent;
               }
               return NavigationDecision.navigate;
             },
             javascriptMode: JavascriptMode.unrestricted,
+            javascriptChannels:
+                <JavascriptChannel>[_jsDataCallback(context)].toSet(),
             onPageStarted: (String url) {
               setState(() {
                 isLoading =
@@ -94,5 +96,26 @@ class _categoryBeritaState extends State<categoryBerita> {
         ],
       ),
     );
+  }
+
+  JavascriptChannel _jsDataCallback(BuildContext context) {
+    return JavascriptChannel(
+        name: 'DataCallback',
+        onMessageReceived: (JavascriptMessage message) {
+          print(message);
+          _doDirectToDetailPage(context, message.message);
+        });
+  }
+
+  _doDirectToDetailPage(BuildContext context, String textData) {
+    final slug = jsonDecode(textData) as Map<String, dynamic>;
+    print(slug['slug_article']);
+
+    try {
+      Provider.of<Article>(context, listen: false)
+          .getDetailArtikel(context, slug['slug_article']);
+    } catch (err) {
+      print(err);
+    }
   }
 }
