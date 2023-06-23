@@ -5,8 +5,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/menu/detailArticle.dart';
+import 'package:sandiwara/menu/news_header_slider_detail.dart';
+import 'package:sandiwara/models/detailArticle.dart';
+import 'package:sandiwara/models/newsHeaderModel.dart';
+import 'package:sandiwara/providers/article.dart';
+import 'package:sandiwara/providers/auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -25,52 +31,12 @@ class _homePageState extends State<homePage> {
   String token = "";
   String? id_user = null;
 
-  InAppWebViewController? webViewController;
-  late PullToRefreshController pullToRefreshController;
-
-  String url = "";
+  late WebViewController controller;
   double progress = 0;
-  final urlController = TextEditingController();
-
-  getToken() async {
-    final bridge = await SharedPreferences.getInstance();
-
-    if (bridge.containsKey('data_login') &&
-        bridge.getString('data_login') != null) {
-      final myData =
-          jsonDecode(bridge.getString('data_login')!) as Map<String, dynamic>;
-
-      if (myData['access_token'] != null) {
-        isAuthenticated = true;
-        token = myData['token'];
-        id_user = myData['id_user'];
-        webViewController?.loadUrl(
-            urlRequest: URLRequest(
-                url: Uri.parse(mainUrl + '/webview/auth/home/' + token)));
-      }
-
-      print(isAuthenticated);
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    // getToken();
-
-    pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
-        color: Colors.blue,
-      ),
-      onRefresh: () async {
-        if (Platform.isAndroid) {
-          webViewController?.reload();
-        } else if (Platform.isIOS) {
-          webViewController?.loadUrl(
-              urlRequest: URLRequest(url: await webViewController?.getUrl()));
-        }
-      },
-    );
   }
 
   @override
@@ -80,101 +46,119 @@ class _homePageState extends State<homePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
-    return FutureBuilder(
-      builder: (context, _) {
-        return Scaffold(
-          body: SafeArea(
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: Stack(
-                    children: [
-                      InAppWebView(
-                        key: webViewKey,
-                        gestureRecognizers: {
-                          Factory<VerticalDragGestureRecognizer>(
-                              () => VerticalDragGestureRecognizer())
-                        },
-                        initialUrlRequest: URLRequest(
-                          url: Uri.parse(url),
-                        ),
-                        initialOptions: options,
-                        pullToRefreshController: pullToRefreshController,
-                        onWebViewCreated: (controller) {
-                          webViewController = controller;
-                        },
-                        onLoadStart: (controller, url) async {
-                          getToken();
-                          // setState(() {
-                          //   this.url = url.toString();
-                          //   urlController.text = this.url;
-                          // });
-                        },
-                        androidOnPermissionRequest:
-                            (controller, origin, resources) async {
-                          return PermissionRequestResponse(
-                              resources: resources,
-                              action: PermissionRequestResponseAction.GRANT);
-                        },
-                        shouldOverrideUrlLoading:
-                            (controller, navigationAction) async {
-                          var uri = navigationAction.request.url!;
-
-                          if (![
-                            "http",
-                            "https",
-                            "file",
-                            "chrome",
-                            "data",
-                            "javascript",
-                            "about"
-                          ].contains(uri.scheme)) {
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              // Launch the App
-                              await launchUrl(
-                                Uri.parse(url),
-                              );
-                              // and cancel the request
-                              return NavigationActionPolicy.CANCEL;
-                            }
-                          }
-
-                          return NavigationActionPolicy.ALLOW;
-                        },
-                        onLoadStop: (controller, url) async {
-                          pullToRefreshController.endRefreshing();
-                          // setState(() {
-                          //   this.url = url.toString();
-                          //   urlController.text = this.url;
-                          // });
-                        },
-                        onLoadError: (controller, url, code, message) {
-                          pullToRefreshController.endRefreshing();
-                        },
-                        onProgressChanged: (controller, progress) {
-                          if (progress == 100) {
-                            pullToRefreshController.endRefreshing();
-                          }
-                          // setState(() {
-                          //   this.progress = progress / 100;
-                          // });
-                        },
-                        onConsoleMessage: (controller, consoleMessage) {
-                          print(consoleMessage);
-                        },
-                      ),
-                      progress < 1.0
-                          ? LinearProgressIndicator(value: progress)
-                          : Container(),
-                    ],
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Stack(
+                children: [
+                  WebView(
+                    gestureNavigationEnabled: true,
+                    initialUrl: mainUrl + '/webview/home',
+                    javascriptMode: JavascriptMode.unrestricted,
+                    javascriptChannels:
+                        <JavascriptChannel>[_jsDataCallback(context)].toSet(),
+                    gestureRecognizers: {
+                      Factory<VerticalDragGestureRecognizer>(
+                          () => VerticalDragGestureRecognizer()
+                            ..onDown = (DragDownDetails dragDownDetails) {
+                              controller.getScrollY().then((value) {
+                                if (value == 0 &&
+                                    dragDownDetails.globalPosition.direction <
+                                        1) {
+                                  controller.reload();
+                                }
+                              });
+                            })
+                    },
+                    onPageStarted: (String url) {
+                      setState(() {});
+                    },
+                    onProgress: (progress) {
+                      setState(() {
+                        this.progress = progress / 100;
+                      });
+                    },
+                    onPageFinished: (String url) {
+                      setState(() {});
+                    },
+                    onWebViewCreated: (controller) {
+                      this.controller = controller;
+                    },
                   ),
-                ),
-              ],
+                  progress < 1.0
+                      ? LinearProgressIndicator(value: progress)
+                      : Container(),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
+  }
+
+  JavascriptChannel _jsDataCallback(BuildContext context) {
+    return JavascriptChannel(
+        name: 'DataCallback',
+        onMessageReceived: (JavascriptMessage message) {
+          print(message);
+          _doDirectToDetailPage(context, message.message);
+          // directToDetailPage(context, message.message);
+          // showAlertDialog(context, message.message);
+        });
+  }
+
+  directToDetailPage(BuildContext context, String textData) {
+    final slug = jsonDecode(textData) as Map<String, dynamic>;
+    print(slug['slug_article']);
+
+    // Navigator.of(context).push(
+    //   PageRouteBuilder(
+    //       pageBuilder: (_, __, ___) => headerSliderDetail(
+    //             item: sampleItems[1],
+    //           ),
+    //       transitionDuration: Duration(milliseconds: 600),
+    //       transitionsBuilder:
+    //           (_, Animation<double> animation, __, Widget child) {
+    //         return Opacity(
+    //           opacity: animation.value,
+    //           child: child,
+    //         );
+    //       }),
+    // );
+  }
+
+  _doDirectToDetailPage(BuildContext context, String textData) {
+    final slug = jsonDecode(textData) as Map<String, dynamic>;
+    print(slug['slug_article']);
+
+    try {
+      Provider.of<Article>(context, listen: false)
+          .getDetailArtikel(context, slug['slug_article']);
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  showAlertDialog(BuildContext context, String text) {
+    Widget okButton = TextButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text("Ok"),
+    );
+    AlertDialog alert = AlertDialog(
+      title: Text("Webview App"),
+      content: Text(text),
+      actions: [okButton],
+    );
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        });
   }
 }
