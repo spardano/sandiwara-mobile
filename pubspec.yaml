@@ -47,6 +47,7 @@ dependencies:
   pull_to_refresh: ^2.0.0
   flutter_inappwebview:
   url_launcher:
+  comment_box: ^0.0.18
 dev_dependencies:
   flutter_test:
     sdk: flutter
