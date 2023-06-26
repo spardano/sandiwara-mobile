@@ -6,12 +6,9 @@ import 'package:comment_box/comment/comment.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/models/commentArticle.dart';
 import 'package:sandiwara/models/detailArticle.dart';
-import 'package:sandiwara/models/newsHeaderModel.dart';
-import 'package:sandiwara/providers/article.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:http/http.dart' as http;
 
@@ -52,12 +49,12 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
     List<commentArticle> commentsData = [];
     try {
       var response = await http.post(
-          Uri.parse(apiUrl + '/guest/comments-article'),
+          Uri.parse('$apiUrl/guest/comments-article'),
           body: {'id_article': detail_article!.id!.toString()});
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
-        print('status comments :' + data['status'].toString());
+        print('status comments :${data['status']}');
 
         for (Map<String, dynamic> item in data['data']) {
           commentsData.add(commentArticle.fromJson(item));

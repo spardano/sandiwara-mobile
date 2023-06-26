@@ -69,9 +69,9 @@ void main() async {
         Locale('hi', 'IN'),
         Locale('id', 'ID')
       ],
-      startLocale: Locale('en', 'US'),
+      startLocale: const Locale('en', 'US'),
       path: 'lib/Screen/Integration/Language_Integration/language',
-      child: MyApp()));
+      child: const MyApp()));
 }
 
 // Lisitnening to the background messages
@@ -97,24 +97,6 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.transparent, //or set color with: Color(0xFF0000FF)
     ));
 
-    // return MaterialApp(
-    //   title: 'Flutter Demo',
-    //   theme: ThemeData(
-    //     // This is the theme of your application.
-    //     //
-    //     // Try running your application with "flutter run". You'll see the
-    //     // application has a blue toolbar. Then, without quitting the app, try
-    //     // changing the primarySwatch below to Colors.green and then invoke
-    //     // "hot reload" (press "r" in the console where you ran "flutter run",
-    //     // or simply save your changes to "hot reload" in a Flutter IDE).
-    //     // Notice that the counter didn't reset back to zero; the application
-    //     // is not restarted.
-    //     primarySwatch: Colors.blue,
-    //   ),
-    //   home: const bottomNavbar(),
-    //   // routes: {'/login': (context) => LoginPage()},
-    // );
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -124,8 +106,8 @@ class MyApp extends StatelessWidget {
           create: (ctx) => Article(),
         ),
       ],
-      builder: (context, child) => MaterialApp(
-        title: 'Flutter Demo',
+      builder: (context, child) => const MaterialApp(
+        title: 'Sandiwara News',
         debugShowCheckedModeBanner: false,
         home: bottomNavbar(),
         routes: {

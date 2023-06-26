@@ -22,7 +22,7 @@ class _categoryBeritaState extends State<categoryBerita> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF9F9F9),
+      backgroundColor: const Color(0xFFF9F9F9),
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
@@ -41,7 +41,7 @@ class _categoryBeritaState extends State<categoryBerita> {
                 controller.goBack();
               }
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back,
               color: Colors.black87,
             ),
@@ -50,7 +50,7 @@ class _categoryBeritaState extends State<categoryBerita> {
             onPressed: () {
               controller.reload();
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.refresh,
               color: Colors.black87,
             ),
@@ -61,7 +61,7 @@ class _categoryBeritaState extends State<categoryBerita> {
       body: Stack(
         children: [
           WebView(
-            initialUrl: mainUrl + '/webview/category',
+            initialUrl: '$mainUrl/webview/category',
             navigationDelegate: (NavigationRequest request) {
               if (request.url == mainUrl) {
                 return NavigationDecision.prevent;
