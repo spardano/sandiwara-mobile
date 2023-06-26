@@ -206,7 +206,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                             withBorder: false,
                             formKey: formKey,
                             commentController: commentController,
-                            backgroundColor: Colors.pink,
+                            backgroundColor: Colors.red[600],
                             textColor: Colors.white,
                             sendWidget: Icon(Icons.send_sharp,
                                 size: 30, color: Colors.white),
