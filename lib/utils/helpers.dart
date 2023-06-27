@@ -7,10 +7,10 @@ class Helpers {
       onPressed: () {
         Navigator.of(context).pop();
       },
-      child: Text("Ok"),
+      child: const Text("Ok"),
     );
     AlertDialog alert = AlertDialog(
-      title: Text("Webview App"),
+      title: const Text("Webview App"),
       content: Text(text),
       actions: [okButton],
     );
