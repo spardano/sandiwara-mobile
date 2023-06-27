@@ -60,12 +60,12 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
     List<commentArticle> commentsData = [];
     try {
       var response = await http.post(
-          Uri.parse(apiUrl + '/guest/comments-article'),
+          Uri.parse('$apiUrl/guest/comments-article'),
           body: {'id_article': detail_article!.id!.toString()});
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
-        print('status comments :' + data['status'].toString());
+        print('status comments :${data['status']}');
 
         for (Map<String, dynamic> item in data['data']) {
           commentsData.add(commentArticle.fromJson(item));
