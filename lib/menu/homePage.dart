@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -27,8 +26,6 @@ class homePage extends StatefulWidget {
 
 class _homePageState extends State<homePage> {
   final GlobalKey webViewKey = GlobalKey();
-  bool isAuthenticated = false;
-  String token = "";
   String? id_user = null;
 
   late WebViewController controller;
