@@ -35,16 +35,6 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
     getComments();
   }
 
-  // getDataComment() {
-  //   try {
-  //     print(detail_article!.id!);
-  //     commentList = Provider.of<Article>(context, listen: false)
-  //         .getComments(int.parse(detail_article!.id!));
-  //   } catch (err) {
-  //     print(err);
-  //   }
-  // }
-
   void getComments() async {
     List<commentArticle> commentsData = [];
     try {
