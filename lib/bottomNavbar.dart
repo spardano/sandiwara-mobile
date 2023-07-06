@@ -58,12 +58,6 @@ class _bottomNavbarState extends State<bottomNavbar> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: callPage(currentIndex),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showNotification();
-        },
-        child: const Icon(Icons.message),
-      ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           canvasColor: Colors.white,
