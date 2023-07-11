@@ -23,10 +23,6 @@ class _profilePageState extends State<profilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF9F9F9),
-
-      ///
-      /// Appbar
-      ///
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
@@ -43,14 +39,10 @@ class _profilePageState extends State<profilePage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            ///
-            /// This is card box for profile
-            ///
             _cardProfile(),
             const SizedBox(
               height: 10.0,
             ),
-
             _cardAnother()
           ],
         ),

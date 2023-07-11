@@ -52,6 +52,9 @@ dependencies:
   flutter_native_splash: ^2.2.18
   flutter_launcher_icons: ^0.12.0
   flutter_local_notifications: ^14.1.1
+  google_fonts: ^4.0.1
+  flutter_svg:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -115,7 +118,7 @@ flutter_native_splash:
   android_disable_fullscreen: true
 
 futter_icons:
-    android: "launcher_icon"
-    ios: true
-    image_path: "assets/images/favicon.png"
-    background_color: "#FFFFFF"
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/favicon.png"
+  background_color: "#FFFFFF"

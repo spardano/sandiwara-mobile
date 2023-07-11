@@ -5,47 +5,41 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sandiwara/bottomNavbar.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/utils/helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
+  var helper = Helpers();
   void signIn(String? email, String? password, context) async {
     try {
-      var response = await http.post(Uri.parse(apiUrl + '/guest/login'),
+      var response = await http.post(Uri.parse('$apiUrl/guest/login'),
           body: {'email': email.toString(), 'password': password.toString()});
-
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body.toString());
-        print(data['access_token']);
-        print('login successfully');
+      var data = jsonDecode(response.body.toString());
+      if (response.statusCode == 201) {
         setLoginData(data['access_token'], data['token'], data['id_user']);
-
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => bottomNavbar()),
+          MaterialPageRoute(builder: (context) => const bottomNavbar()),
         );
       } else {
-        print('failed');
+        helper.showScafoldMessage(context, data['message']);
       }
     } catch (e) {
-      print(e.toString());
+      helper.showScafoldMessage(context, e.toString());
     }
   }
 
   void signUp(String? nama, String? email, String? password, context) async {
-    Uri url = Uri.parse(apiUrl + '/guest/register');
-
     try {
       var response =
-          await http.post(Uri.parse(apiUrl + '/guest/register'), body: {
+          await http.post(Uri.parse('$apiUrl/guest/register'), body: {
         'nama': nama.toString(),
         'email': email.toString(),
         'password': password.toString()
       });
 
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body.toString());
-        print(data['access_token']);
-        print('login successfully');
+      var data = jsonDecode(response.body.toString());
+      if (response.statusCode == 201) {
         setLoginData(data['access_token'], data['token'], data['id_user']);
 
         var res = jsonDecode(response.body);
@@ -55,13 +49,13 @@ class Auth with ChangeNotifier {
 
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => bottomNavbar()),
+          MaterialPageRoute(builder: (context) => const bottomNavbar()),
         );
       } else {
-        print('failed');
+        helper.showScafoldMessage(context, data['message']);
       }
     } catch (e) {
-      print(e.toString());
+      helper.showScafoldMessage(context, e.toString());
     }
   }
 

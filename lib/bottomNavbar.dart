@@ -5,7 +5,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/menu/categoryBerita.dart';
 import 'package:sandiwara/menu/homePage.dart';
+import 'package:sandiwara/menu/searchBerita.dart';
 import 'package:sandiwara/topBar.dart';
+import 'package:sandiwara/widgets/customDialog.dart';
 
 class bottomNavbar extends StatefulWidget {
   const bottomNavbar({super.key, this.notificationAppLaunchDetails});
@@ -28,6 +30,8 @@ class _bottomNavbarState extends State<bottomNavbar> {
         break;
       case 1:
         return const categoryBerita();
+      case 2:
+        return const searchBerita();
       default:
         return const homePage();
     }
@@ -58,6 +62,13 @@ class _bottomNavbarState extends State<bottomNavbar> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: callPage(currentIndex),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // showNotification();
+          showDialog(context: context, builder: (context) => customDialog());
+        },
+        child: const Icon(Icons.message),
+      ),
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           canvasColor: Colors.white,

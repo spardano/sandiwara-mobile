@@ -28,22 +28,21 @@ class Article with ChangeNotifier {
         if (data['status']) {
           Navigator.of(context).push(
             PageRouteBuilder(
-                pageBuilder: (_, __, ___) => headerSliderDetail(
-                      detail_article: detail_article,
-                    ),
-                transitionDuration: Duration(milliseconds: 600),
-                transitionsBuilder:
-                    (_, Animation<double> animation, __, Widget child) {
-                  return Opacity(
-                    opacity: animation.value,
-                    child: child,
-                  );
-                }),
+              pageBuilder: (_, __, ___) => headerSliderDetail(
+                detail_article: detail_article,
+              ),
+              transitionDuration: Duration(milliseconds: 600),
+              transitionsBuilder:
+                  (_, Animation<double> animation, __, Widget child) {
+                return Opacity(
+                  opacity: animation.value,
+                  child: child,
+                );
+              },
+            ),
           );
         }
-      } else {
-        print('failed');
-      }
+      } else {}
     } catch (e) {
       print(e.toString());
     }

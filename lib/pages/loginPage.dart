@@ -1,17 +1,10 @@
 // ignore_for_file: sort_child_properties_last
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
-import 'package:sandiwara/bottomNavbar.dart';
-import 'package:sandiwara/constant.dart';
-import 'package:sandiwara/menu/homePage.dart';
 import 'package:sandiwara/pages/registerPage.dart';
 import 'package:sandiwara/providers/auth.dart';
-import 'package:sandiwara/utils/authentication.dart';
-import 'package:sandiwara/widgets/googleSignInButton.dart';
+import 'package:sandiwara/utils/helpers.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,13 +14,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  Map<String?, String?> _loginObject = Map<String?, String?>();
+  final Map<String?, String?> _loginObject = <String?, String?>{};
 
   //create a TexteditingController
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   AutovalidateMode _autovalidate = AutovalidateMode.always;
   String? pass;
   bool _passwordVisible = false;
+
+  late AnimationController animationController;
+
+  bool isLoading = true;
 
   @override
   void dispose() {
@@ -37,7 +34,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -119,13 +115,12 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
-
                       const SizedBox(
                         height: 25,
                       ),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(25),
-                        child: Container(
+                        child: SizedBox(
                           width: 280,
                           child: Stack(
                             children: <Widget>[
@@ -154,7 +149,11 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: () {
                                   _doLogin();
                                 },
-                                child: const Center(child: Text('Login')),
+                                child: isLoading == true
+                                    ? const CircularProgressIndicator(
+                                        value: 0.2,
+                                      )
+                                    : const Center(child: Text('Login')),
                               ),
                             ],
                           ),
@@ -163,11 +162,6 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(
                         height: 20,
                       ),
-                      // const Text("Forgot your password?",
-                      //     style: TextStyle(
-                      //         fontFamily: "Sofia",
-                      //         fontWeight: FontWeight.bold,
-                      //         color: Colors.white)),
                     ],
                   ),
                 ),
@@ -185,11 +179,12 @@ class _LoginPageState extends State<LoginPage> {
                       Center(
                         child: TextButton(
                           onPressed: () {
-                            //register
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => registerPage()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const registerPage(),
+                              ),
+                            );
                           },
                           child: const Text(
                             "Daftar Akun",
@@ -200,57 +195,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       )
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       vertical: 20, horizontal: 20),
-                      //   child: Row(
-                      //     children: [
-                      //       FutureBuilder(
-                      //         future: Authentication.initializeFirebase(
-                      //             context: context),
-                      //         builder: (context, snapshot) {
-                      //           if (snapshot.hasError) {
-                      //             return Text('Error initializing Firebase');
-                      //           } else if (snapshot.connectionState ==
-                      //               ConnectionState.done) {
-                      //             return googleSignInButton();
-                      //           }
-                      //           return const CircularProgressIndicator(
-                      //             valueColor: AlwaysStoppedAnimation<Color>(
-                      //               Colors.red,
-                      //             ),
-                      //           );
-                      //         },
-                      //       ),
-                      //       const SizedBox(width: 12),
-                      //       Expanded(
-                      //         child: AppOutlineButton(
-                      //           asset: "assets/images/facebook.png",
-                      //           onTap: () {},
-                      //         ),
-                      //       ),
-                      //       const SizedBox(width: 12),
-                      //     ],
-                      //   ),
-                      // ),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: const [
-                      //     Text("Don't have an account? ",
-                      //         style: TextStyle(
-                      //             fontFamily: "Sofia",
-                      //             fontWeight: FontWeight.bold,
-                      //             color: Colors.blueGrey)),
-                      //     SizedBox(
-                      //       width: 10,
-                      //     ),
-                      //     Text("Sign Up",
-                      //         style: TextStyle(
-                      //             fontFamily: "Sofia",
-                      //             fontWeight: FontWeight.bold,
-                      //             color: Colors.blueGrey))
-                      //   ],
-                      // )
                     ],
                   ),
                 ),
@@ -269,11 +213,13 @@ class _LoginPageState extends State<LoginPage> {
       },
       validator: (val) {
         RegExp regex = RegExp(r'\w+@\w+\.\w+');
-        if (val == null)
-          return 'Emaril harus diisikan';
-        else if (!regex.hasMatch(val)) return 'Masukkan email yang valid';
+        if (val == null) {
+          return 'Email harus diisikan';
+        } else if (!regex.hasMatch(val)) {
+          return 'Masukkan email yang valid';
+        }
       },
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       decoration: const InputDecoration(
         hintStyle: TextStyle(color: Colors.white, fontFamily: "Sofia"),
         hintText: 'Masukkan email',
@@ -294,7 +240,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget get _buildPasswordField {
     return TextFormField(
       obscureText: _passwordVisible,
-      style: TextStyle(color: Colors.white),
+      style: const TextStyle(color: Colors.white),
       onChanged: (String val) => setState(() => pass = val),
       onSaved: (String? val) => _loginObject['password'] = val,
       validator: (String? val) {
@@ -303,10 +249,12 @@ class _LoginPageState extends State<LoginPage> {
         RegExp hasDigit = RegExp(r'\d');
         RegExp hasPunct = RegExp(r'[!@#\$&*~-]');
 
-        if (!RegExp(r'.{8,}').hasMatch(val!))
+        if (!RegExp(r'.{8,}').hasMatch(val!)) {
           return 'Passwords must have at least 8 characters';
-        if (!hasDigit.hasMatch(val))
+        }
+        if (!hasDigit.hasMatch(val)) {
           return 'Passwords must have at least one number';
+        }
       },
       decoration: InputDecoration(
         hintText: 'Masukkan Password',
@@ -338,7 +286,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _doLogin() async {
-    setState(() => _autovalidate = AutovalidateMode.always);
+    setState(() {
+      _autovalidate = AutovalidateMode.always;
+    });
 
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -347,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
         Provider.of<Auth>(context, listen: false)
             .signIn(_loginObject['email'], _loginObject['password'], context);
       } catch (err) {
-        print(err);
+        Helpers().showScafoldMessage(context, err.toString());
       }
     }
   }
