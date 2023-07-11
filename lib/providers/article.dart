@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/menu/news_header_slider_detail.dart';
+import 'package:sandiwara/models/articleList.dart';
 import 'package:sandiwara/models/commentArticle.dart';
 import 'package:sandiwara/models/detailArticle.dart';
 import 'package:sandiwara/models/newsHeaderModel.dart';
+import 'package:sandiwara/widgets/customDialog.dart';
 
 class Article with ChangeNotifier {
   void getDetailArtikel(context, String slug) async {
@@ -42,7 +44,13 @@ class Article with ChangeNotifier {
           );
         }
       } else {
-        print('failed');
+        showDialog(
+            context: context,
+            builder: (context) => customDialog(
+                  header: 'Gagal',
+                  text: 'Berita gagal ditemukan, coba kembali',
+                  type: 'warning',
+                ));
       }
     } catch (e) {
       print(e.toString());
@@ -55,15 +63,8 @@ class Article with ChangeNotifier {
       var response = await http.post(Uri.parse(apiUrl + '/auth/store-comment'),
           headers: {'Authorization': token},
           body: {'message': text, 'id_article': id_article});
-
-      // if (response.statusCode == 200) {
-      //   return true;
-      // } else {
-      //   return false;
-      // }
     } catch (e) {
       print(e.toString());
-      // return false;
     }
   }
 

@@ -12,6 +12,7 @@ class detailArticle {
     this.author,
     this.tanggal_publish,
     this.content,
+    this.url_source,
   });
 
   final String? id;
@@ -26,24 +27,29 @@ class detailArticle {
   final String? author;
   final String? tanggal_publish;
   final List<ContentArticle>? content;
+  final String? url_source;
 
   factory detailArticle.fromJson(Map<String, dynamic> json) => detailArticle(
-      id: json["id"] == null ? null : json["id"].toString(),
-      slug: json["slug"] == null ? null : json["slug"],
-      title: json["title"] == null ? null : json["title"],
-      oriTitle: json["oriTitle"] == null ? null : json["oriTitle"],
-      image: json["image"] == null ? null : json["image"],
-      url: json["url"] == null ? null : json["url"],
-      jumlahView: json["jumlahView"] == null ? null : json["jumlahView"],
-      jumlahComments:
-          json["jumlahComments"] == null ? null : json["jumlahComments"],
-      category: json["category"] == null ? null : json["category"],
-      author: json["author"] == null ? null : json["author"],
-      tanggal_publish: json["tanggal_publish"] == null ? null : json['tanggal_publish'],
-      content: json["content"] == null
-          ? null
-          : List<ContentArticle>.from(
-              json["content"].map((x) => ContentArticle.fromJson(x))));
+        id: json["id"] == null ? null : json["id"].toString(),
+        slug: json["slug"] == null ? null : json["slug"],
+        title: json["title"] == null ? null : json["title"],
+        oriTitle: json["oriTitle"] == null ? null : json["oriTitle"],
+        image: json["image"] == null ? null : json["image"],
+        url: json["url"] == null ? null : json["url"],
+        jumlahView: json["jumlahView"] == null ? null : json["jumlahView"],
+        jumlahComments:
+            json["jumlahComments"] == null ? null : json["jumlahComments"],
+        category: json["category"] == null ? null : json["category"],
+        author: json["author"] == null ? null : json["author"],
+        tanggal_publish:
+            json["tanggal_publish"] == null ? null : json['tanggal_publish'],
+        content: json["content"] == null
+            ? null
+            : List<ContentArticle>.from(
+                json["content"].map((x) => ContentArticle.fromJson(x)),
+              ),
+        url_source: json["url_source"] == null ? null : json["url_source"],
+      );
 }
 
 class ContentArticle {

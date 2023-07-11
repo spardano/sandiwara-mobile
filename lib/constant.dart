@@ -6,8 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-const String apiUrl = 'http://192.168.0.215:8000/api';
-const String mainUrl = 'http://192.168.0.215:8000';
+const String apiUrl = 'http://192.168.100.86:8000/api';
+const String mainUrl = 'http://192.168.100.86:8000';
+// const String apiUrl = 'https://sandiwara.id/api';
+// const String mainUrl = 'https://sandiwara.id';
 
 InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
   crossPlatform: InAppWebViewOptions(
