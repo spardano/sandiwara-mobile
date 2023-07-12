@@ -1,4 +1,4 @@
-// ignore_for_file: sort_child_properties_last
+// ignore_for_file: sort_child_properties_last, prefer_const_constructors
 
 import 'dart:convert';
 
@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   AutovalidateMode _autovalidate = AutovalidateMode.always;
   String? pass;
-  bool _passwordVisible = false;
+  bool _passwordVisible = true;
 
   @override
   void dispose() {
@@ -274,8 +274,9 @@ class _LoginPageState extends State<LoginPage> {
         else if (!regex.hasMatch(val)) return 'Masukkan email yang valid';
       },
       style: TextStyle(color: Colors.white),
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         hintStyle: TextStyle(color: Colors.white, fontFamily: "Sofia"),
+        errorStyle: TextStyle(color: Colors.orange[300], fontSize: 14.0),
         hintText: 'Masukkan email',
         icon: Icon(Icons.person, color: Colors.white),
         enabledBorder: UnderlineInputBorder(
@@ -304,9 +305,9 @@ class _LoginPageState extends State<LoginPage> {
         RegExp hasPunct = RegExp(r'[!@#\$&*~-]');
 
         if (!RegExp(r'.{8,}').hasMatch(val!))
-          return 'Passwords must have at least 8 characters';
+          return 'Password harus minimal 8 karakter';
         if (!hasDigit.hasMatch(val))
-          return 'Passwords must have at least one number';
+          return 'Passwords harus berisi satu buah angka';
       },
       decoration: InputDecoration(
         hintText: 'Masukkan Password',
@@ -324,6 +325,7 @@ class _LoginPageState extends State<LoginPage> {
             });
           },
         ),
+        errorStyle: TextStyle(color: Colors.orange[300], fontSize: 14.0),
         enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Colors.white),
         ),

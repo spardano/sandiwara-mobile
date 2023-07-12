@@ -16,6 +16,7 @@ import 'package:sandiwara/providers/article.dart';
 import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:sandiwara/widgets/customTag.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:http/http.dart' as http;
 
@@ -242,13 +243,12 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                           fontSize: 25,
                           fontFamily: "Popins",
                           fontWeight: FontWeight.w700),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
                 for (var item in detail_article!.content!)
                   Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
@@ -270,38 +270,50 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: Container(
-                                    margin: EdgeInsets.symmetric(
-                                        horizontal: 20.0, vertical: 20.0),
-                                    padding: EdgeInsets.all(16.0),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue[600],
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Baca Juga",
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 10.0,
-                                        ),
-                                        Text(
-                                          item.other!,
-                                          style: TextStyle(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      print(detail_article!.url_source!
+                                          .toString());
+                                      final Uri url = Uri.parse(
+                                          detail_article!.url_source!);
+                                      if (!await launchUrl(url)) {
+                                        throw Exception(
+                                            'Could not launch the link');
+                                      }
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 20.0),
+                                      padding: EdgeInsets.all(16.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue[600],
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Baca Juga",
+                                            style: TextStyle(
+                                              fontSize: 18,
                                               color: Colors.white,
-                                              fontSize: 14),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10.0,
+                                          ),
+                                          Text(
+                                            item.other!,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -379,7 +391,12 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                                     } else {
                                       showDialog(
                                           context: context,
-                                          builder: (context) => customDialog());
+                                          builder: (context) => customDialog(
+                                                header: 'Peringantan',
+                                                text:
+                                                    'Anda harus login untuk melanjutkan!',
+                                                type: 'warning',
+                                              ));
                                     }
                                   },
                                   backgroundColor: Colors.red[600],

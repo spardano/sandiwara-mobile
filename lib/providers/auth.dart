@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sandiwara/bottomNavbar.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
@@ -13,8 +14,9 @@ class Auth with ChangeNotifier {
       var response = await http.post(Uri.parse(apiUrl + '/guest/login'),
           body: {'email': email.toString(), 'password': password.toString()});
 
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body.toString());
+      var data = jsonDecode(response.body.toString());
+
+      if (data['status'] == true) {
         print(data['access_token']);
         print('login successfully');
         setLoginData(data['access_token'], data['token'], data['id_user']);
@@ -24,7 +26,13 @@ class Auth with ChangeNotifier {
           MaterialPageRoute(builder: (context) => bottomNavbar()),
         );
       } else {
-        print('failed');
+        showDialog(
+            context: context,
+            builder: (context) => customDialog(
+                  header: 'Gagal',
+                  text: data['message'],
+                  type: 'warning',
+                ));
       }
     } catch (e) {
       print(e.toString());
@@ -42,13 +50,13 @@ class Auth with ChangeNotifier {
         'password': password.toString()
       });
 
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body.toString());
-        print(data['access_token']);
-        print('login successfully');
-        setLoginData(data['access_token'], data['token'], data['id_user']);
+      var data = jsonDecode(response.body.toString());
+      print(data['access_token']);
+      setLoginData(data['access_token'], data['token'], data['id_user']);
 
-        var res = jsonDecode(response.body);
+      var res = jsonDecode(response.body);
+
+      if (data['status']) {
         if (res['status'] == false) {
           throw res['message'];
         }
@@ -58,7 +66,13 @@ class Auth with ChangeNotifier {
           MaterialPageRoute(builder: (context) => bottomNavbar()),
         );
       } else {
-        print('failed');
+        showDialog(
+            context: context,
+            builder: (context) => customDialog(
+                  header: 'Gagal',
+                  text: res['message'],
+                  type: 'warning',
+                ));
       }
     } catch (e) {
       print(e.toString());
