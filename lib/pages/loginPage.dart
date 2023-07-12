@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sandiwara/pages/registerPage.dart';
 import 'package:sandiwara/providers/auth.dart';
 import 'package:sandiwara/utils/helpers.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,11 +21,13 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   AutovalidateMode _autovalidate = AutovalidateMode.always;
   String? pass;
-  bool _passwordVisible = false;
+  String? errorEmail;
+  String? errorPassword;
+  bool _passwordVisible = true;
 
   late AnimationController animationController;
 
-  bool isLoading = true;
+  bool isLoading = false;
 
   @override
   void dispose() {
@@ -105,8 +108,14 @@ class _LoginPageState extends State<LoginPage> {
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.only(
+                                  top: 20, right: 20, left: 20),
                               child: _buildEmailField,
+                            ),
+                            Text(
+                              errorEmail.toString(),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 12),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(20.0),
@@ -149,11 +158,12 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: () {
                                   _doLogin();
                                 },
-                                child: isLoading == true
-                                    ? const CircularProgressIndicator(
-                                        value: 0.2,
-                                      )
-                                    : const Center(child: Text('Login')),
+                                child: Center(
+                                  child: isLoading == true
+                                      ? LoadingAnimationWidget.inkDrop(
+                                          color: Colors.white, size: 20)
+                                      : const Text('Login'),
+                                ),
                               ),
                             ],
                           ),
@@ -213,11 +223,14 @@ class _LoginPageState extends State<LoginPage> {
       },
       validator: (val) {
         RegExp regex = RegExp(r'\w+@\w+\.\w+');
-        if (val == null) {
-          return 'Email harus diisikan';
-        } else if (!regex.hasMatch(val)) {
-          return 'Masukkan email yang valid';
-        }
+        setState(() {
+          if (val == null) {
+            errorEmail = 'Email harus diisikan';
+          } else if (!regex.hasMatch(val)) {
+            errorEmail = 'Masukkan email yang valid';
+          }
+        });
+        return null;
       },
       style: const TextStyle(color: Colors.white),
       decoration: const InputDecoration(
@@ -262,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
         icon: const Icon(Icons.lock, color: Colors.white),
         suffixIcon: IconButton(
           icon: Icon(
-            _passwordVisible ? Icons.visibility : Icons.visibility_off,
+            _passwordVisible ? Icons.visibility_off : Icons.visibility,
             color: Colors.white,
           ),
           onPressed: () {
