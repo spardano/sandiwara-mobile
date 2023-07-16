@@ -65,7 +65,13 @@ class _bottomNavbarState extends State<bottomNavbar> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // showNotification();
-          showDialog(context: context, builder: (context) => customDialog());
+          showDialog(
+              context: context,
+              builder: (context) => customDialog(
+                    header: 'Berhasil',
+                    text: 'Ini adalah testing',
+                    type: 'success',
+                  ));
         },
         child: const Icon(Icons.message),
       ),

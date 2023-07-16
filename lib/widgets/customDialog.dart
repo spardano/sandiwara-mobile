@@ -8,7 +8,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sandiwara/pages/loginPage.dart';
 
 class customDialog extends StatelessWidget {
-  const customDialog({super.key});
+  const customDialog(
+      {Key? key, required this.header, required this.text, required this.type})
+      : super(key: key);
+
+  final String text;
+  final String type;
+  final String header;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +22,11 @@ class customDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       child: Stack(
         children: [
-          CardDialog(),
+          CardDialog(
+            text: text,
+            type: type,
+            header: header,
+          ),
           Positioned(
             top: 0,
             right: 0,
@@ -45,9 +55,13 @@ class customDialog extends StatelessWidget {
 }
 
 class CardDialog extends StatelessWidget {
-  const CardDialog({
-    Key? key,
-  }) : super(key: key);
+  const CardDialog(
+      {Key? key, required this.header, required this.text, required this.type})
+      : super(key: key);
+
+  final String text;
+  final String type;
+  final String header;
 
   @override
   Widget build(BuildContext context) {
@@ -65,15 +79,15 @@ class CardDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.warning,
-            color: Colors.amber[700],
+            type == 'success' ? Icons.check : Icons.warning,
+            color: type == 'success' ? Colors.green[700] : Colors.amber[700],
             size: 60.0,
           ),
           SizedBox(
             height: 24,
           ),
           Text(
-            'Peringatan',
+            header,
             style: GoogleFonts.montserrat(
               fontSize: 20,
               color: Colors.grey[700],
@@ -83,7 +97,7 @@ class CardDialog extends StatelessWidget {
             height: 24,
           ),
           Text(
-            'Anda perlu login terlebih dahulu untuk menambahkan komentar',
+            text,
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w300,

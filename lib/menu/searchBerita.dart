@@ -1,7 +1,19 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:sandiwara/models/News.dart';
+import 'package:provider/provider.dart';
+import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/models/articleList.dart';
+import 'package:sandiwara/models/news.dart';
+import 'package:sandiwara/providers/article.dart';
+import 'package:sandiwara/utils/helpers.dart';
+import 'package:sandiwara/widgets/card_news.dart';
+import 'package:sandiwara/widgets/imageContainer.dart';
+import 'package:http/http.dart' as http;
 
 class searchBerita extends StatefulWidget {
   const searchBerita({super.key});
@@ -11,96 +23,163 @@ class searchBerita extends StatefulWidget {
 }
 
 class _searchBeritaState extends State<searchBerita> {
-  final newsItem = <News>[
-    News(
-        id: 231,
-        category: "Sporth",
-        imagePath:
-            "https://images.pexels.com/photos/5837131/pexels-photo-5837131.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-        title: "Basketball new team",
-        content:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry"),
-    News(
-        id: 2313,
-        category: "Politic",
-        imagePath:
-            "https://images.pexels.com/photos/4560088/pexels-photo-4560088.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500",
-        title: "United States Public new president",
-        content:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry"),
-    News(
-        id: 231,
-        category: "Tech",
-        imagePath:
-            "https://images.pexels.com/photos/3861964/pexels-photo-3861964.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-        title: "New framework flutter",
-        content:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry"),
-  ];
+  int page = 1;
+  List<ArticleList> articleList = <ArticleList>[];
+  String keyword = '';
+  final ScrollController _listController = ScrollController();
+  Timer? _debounce;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _listController.addListener(() {
+      if (_listController.position.maxScrollExtent ==
+          _listController.position.pixels) {
+        page++;
+        setState(() {});
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _listController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  Future getListArtikel() async {
+    try {
+      var response = await http.post(
+          Uri.parse('$apiUrl/guest/search-article?page=$page'),
+          body: {'cari': keyword});
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body.toString());
+
+        for (Map<String, dynamic> item in data['data']['data_article']) {
+          articleList.add(ArticleList.fromJson(item));
+        }
+        setState(() {
+          isLoading = false;
+        });
+        return articleList;
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        print(articleList.length);
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      Helpers().showScafoldMessage(context, e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         children: [
-          _TemukanBerita(),
-        ],
-      ),
-    );
-  }
-}
-
-class _TemukanBerita extends StatelessWidget {
-  const _TemukanBerita({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.25,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Temukan Berita',
-            style: Theme.of(context).textTheme.headline4!.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w900,
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.25,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Temukan Berita',
+                  style: Theme.of(context).textTheme.headline4!.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w900,
+                      ),
                 ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            'Dapatkan berita terbaru dari berbagai sumber',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          TextFormField(
-            decoration: InputDecoration(
-              hintText: 'Cari Berita',
-              fillColor: Colors.grey.shade200,
-              filled: true,
-              prefixIcon: const Icon(
-                Icons.search,
-                color: Colors.grey,
-              ),
-              suffixIcon: const RotatedBox(
-                quarterTurns: 1,
-                child: Icon(
-                  Icons.tune,
-                  color: Colors.grey,
+                const SizedBox(
+                  height: 5,
                 ),
-              ),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                  borderSide: BorderSide.none),
+                Text(
+                  'Dapatkan berita terbaru dari berbagai sumber',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Cari Berita',
+                    fillColor: Colors.grey.shade200,
+                    filled: true,
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: Colors.grey,
+                    ),
+                    suffixIcon: const RotatedBox(
+                      quarterTurns: 1,
+                      child: Icon(
+                        Icons.tune,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20.0),
+                        borderSide: BorderSide.none),
+                  ),
+                  onChanged: (word) {
+                    if (word.length >= 4) {
+                      setState(() {
+                        isLoading = true;
+                        keyword = word;
+                        articleList.clear();
+                      });
+                    }
+                  },
+                )
+              ],
             ),
+          ),
+          FutureBuilder(
+            future: getListArtikel(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: ListView.builder(
+                    controller: _listController,
+                    itemCount: snapshot.data!.length ?? 0,
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      return CardNews(
+                        slug: snapshot.data![index].slug!,
+                        image: snapshot.data![index].image!,
+                        tanggalPublish: snapshot.data![index].tanggal_publish!,
+                        jumlahView: snapshot.data![index].jumlahView.toString(),
+                        title: snapshot.data![index].title,
+                      );
+                    },
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return const Center(child: Text('Something went wrong'));
+              } else if (isLoading == true) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+                // return Center(child: snapshot.status == false ? const Text("Article tidak ditemukan") : const CircularProgressIndicator());
+              } else if (articleList.isEmpty) {
+                return const Center(
+                  child: Text("Article tidak ditemukan "),
+                );
+              } else {
+                return const Center(
+                  child: Text("Terjadi kesalahan"),
+                );
+              }
+            },
           )
         ],
       ),
