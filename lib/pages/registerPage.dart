@@ -32,7 +32,7 @@ class _registerPageState extends State<registerPage> {
   final TextEditingController _passwordKonfirmasiController =
       TextEditingController();
   final Auth _autenticationController = Get.put(Auth());
-  AutovalidateMode _autovalidate = AutovalidateMode.always;
+  final AutovalidateMode _autovalidate = AutovalidateMode.onUserInteraction;
   String? pass;
 
   // Create a controller for the password TextFormField
@@ -111,6 +111,10 @@ class _registerPageState extends State<registerPage> {
                         child: Column(
                           children: [
                             TextFieldInput(
+                                sufixIconColor: Colors.white,
+                                errorTextColor: Colors.yellow,
+                                textColor: Colors.white,
+                                textHintColor: Colors.grey,
                                 controller: _namaController,
                                 icon: const Icon(
                                   Icons.card_membership,
@@ -128,6 +132,10 @@ class _registerPageState extends State<registerPage> {
                                 obscureText: false,
                                 sufixIcon: false),
                             TextFieldInput(
+                                sufixIconColor: Colors.white,
+                                errorTextColor: Colors.yellow,
+                                textColor: Colors.white,
+                                textHintColor: Colors.grey,
                                 controller: _emailController,
                                 icon: const Icon(
                                   Icons.email,
@@ -145,6 +153,10 @@ class _registerPageState extends State<registerPage> {
                                 obscureText: false,
                                 sufixIcon: false),
                             TextFieldInput(
+                              sufixIconColor: Colors.white,
+                              errorTextColor: Colors.yellow,
+                              textColor: Colors.white,
+                              textHintColor: Colors.grey,
                               controller: _passwordController,
                               icon: const Icon(
                                 Icons.key,
@@ -164,6 +176,10 @@ class _registerPageState extends State<registerPage> {
                               sufixIcon: true,
                             ),
                             TextFieldInput(
+                              sufixIconColor: Colors.white,
+                              errorTextColor: Colors.yellow,
+                              textColor: Colors.white,
+                              textHintColor: Colors.grey,
                               controller: _passwordKonfirmasiController,
                               icon: const Icon(
                                 Icons.key,

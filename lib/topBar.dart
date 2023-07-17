@@ -70,7 +70,8 @@ class _topBarState extends State<topBar> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const LoginPage()),
+                                  builder: (context) => const LoginPage(),
+                                ),
                               );
                             } else {
                               try {
@@ -78,12 +79,13 @@ class _topBarState extends State<topBar> {
                                     .getUser(context);
                               } catch (err) {
                                 showDialog(
-                                    context: context,
-                                    builder: (context) => const customDialog(
-                                          header: 'Gagal',
-                                          text: 'Gagal Menampilkan data',
-                                          type: 'warning',
-                                        ));
+                                  context: context,
+                                  builder: (context) => const customDialog(
+                                    header: 'Gagal',
+                                    text: 'Gagal Menampilkan data',
+                                    type: 'warning',
+                                  ),
+                                );
                               }
                             }
                           },

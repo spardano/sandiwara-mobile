@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, no_logic_in_create_state
 
 import 'dart:convert';
 import 'dart:ffi';
@@ -8,9 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/controller/ProfileController.dart';
-import 'package:sandiwara/models/userData.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/models/user_data.dart';
+import 'package:sandiwara/pages/change_password.dart';
 import 'package:sandiwara/providers/auth.dart';
 
 class profilePage extends StatefulWidget {
@@ -19,20 +20,15 @@ class profilePage extends StatefulWidget {
 
   final userData userDataStorage;
   @override
-  State<profilePage> createState() => _profilePageState(userDataStorage);
+  State<profilePage> createState() => _profilePageState();
 }
 
 class _profilePageState extends State<profilePage> {
-  userData userDataStorage;
-
-  _profilePageState(this.userDataStorage);
-
   int tapvalue = 0;
 
   @override
   void initState() {
     super.initState();
-    setState(() {});
   }
 
   @override
@@ -72,9 +68,12 @@ class _profilePageState extends State<profilePage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CardProfile(),
+                    CardProfile(
+                      email: widget.userDataStorage.email.toString(),
+                      nama: widget.userDataStorage.name.toString(),
+                    ),
                     PanelProfile(
-                      userDataStorage: userDataStorage,
+                      userDataStorage: widget.userDataStorage,
                     ),
                   ],
                 ),
@@ -214,42 +213,21 @@ class _PanelProfileState extends State<PanelProfile> {
             height: 15.0,
           ),
           Line(),
-          SizedBox(
-            height: 15.0,
-          ),
-          Text(
-            "Ganti Password",
-            style: textStyleTitle,
-          ),
-          SizedBox(
-            height: 15.0,
+          TextButton(
+            style: TextButton.styleFrom(padding: EdgeInsets.all(0)),
+            child: Text(
+              "Ganti Password",
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+            ),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const ChangePassword(),
+              ));
+            },
           ),
           Line(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text("Notifikasi", style: textStyleTitle),
-              Switch(
-                value: _switch1,
-                onChanged: (bool e) => {
-                  setState(() {
-                    if (e) {
-                      e = true;
-                      _switch1 = true;
-                    } else {
-                      e = false;
-                      _switch1 = false;
-                    }
-                  })
-                },
-                activeColor: Colors.lightBlueAccent,
-                inactiveTrackColor: Colors.black12,
-              ),
-            ],
-          ),
-          Text(
-              "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan mengenai berita terkini dengan mengaktifkan notifikasi",
-              style: textStyleDeskripsi),
+          UpdateNotification(),
+          UpdateNotification(),
           SizedBox(
             height: 15.0,
           ),
@@ -259,6 +237,50 @@ class _PanelProfileState extends State<PanelProfile> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class UpdateNotification extends StatefulWidget {
+  const UpdateNotification({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<UpdateNotification> createState() => _UpdateNotificationState();
+}
+
+class _UpdateNotificationState extends State<UpdateNotification> {
+  bool _switch = false;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text("Notifikasi", style: textStyleTitle),
+            Switch(
+              value: _switch,
+              onChanged: (e) {
+                if (e) {
+                  e = true;
+                  _switch = true;
+                } else {
+                  e = false;
+                  _switch = false;
+                }
+                setState(() {});
+              },
+              activeColor: Colors.lightBlueAccent,
+              inactiveTrackColor: Colors.black12,
+            ),
+          ],
+        ),
+        Text(
+            "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan mengenai berita terkini dengan mengaktifkan notifikasi",
+            style: textStyleDeskripsi),
+      ],
     );
   }
 }
@@ -281,8 +303,11 @@ class Line extends StatelessWidget {
 class CardProfile extends StatelessWidget {
   const CardProfile({
     Key? key,
+    required this.nama,
+    required this.email,
   }) : super(key: key);
-
+  final String nama;
+  final String email;
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -319,16 +344,16 @@ class CardProfile extends StatelessWidget {
                 const SizedBox(
                   height: 12.0,
                 ),
-                const Text(
-                  "Jipau Developer",
+                Text(
+                  nama ?? "Jipau Developer",
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontFamily: "Popins",
                       color: Colors.white,
                       letterSpacing: 1.5),
                 ),
-                const Text(
-                  "Jipaudev@gmail.com",
+                Text(
+                  email ?? "Jipaudev@gmail.com",
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w200,
