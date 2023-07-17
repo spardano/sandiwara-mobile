@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -56,3 +57,9 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   importance: Importance.high,
   playSound: true,
 );
+
+const textStyleTitle = TextStyle(
+    color: Colors.black54, fontWeight: FontWeight.w700, fontSize: 15.0);
+
+const textStyleDeskripsi =
+    TextStyle(color: Colors.black26, fontWeight: FontWeight.w400);

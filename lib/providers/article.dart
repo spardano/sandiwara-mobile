@@ -26,8 +26,6 @@ class Article with ChangeNotifier {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
-        print('status article :${data['status']}');
-
         final detailArticle detail_article =
             detailArticle.fromJson(data['data']);
 

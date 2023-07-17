@@ -61,20 +61,9 @@ class _searchBeritaState extends State<searchBerita> {
         for (Map<String, dynamic> item in data['data']['data_article']) {
           articleList.add(ArticleList.fromJson(item));
         }
-        setState(() {
-          isLoading = false;
-        });
         return articleList;
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-        print(articleList.length);
       }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
       Helpers().showScafoldMessage(context, e.toString());
     }
   }
@@ -129,13 +118,10 @@ class _searchBeritaState extends State<searchBerita> {
                         borderSide: BorderSide.none),
                   ),
                   onChanged: (word) {
-                    if (word.length >= 4) {
-                      setState(() {
-                        isLoading = true;
-                        keyword = word;
-                        articleList.clear();
-                      });
-                    }
+                    setState(() {
+                      keyword = word;
+                      articleList.clear();
+                    });
                   },
                 )
               ],
@@ -144,7 +130,8 @@ class _searchBeritaState extends State<searchBerita> {
           FutureBuilder(
             future: getListArtikel(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasData) {
                 return SizedBox(
                   height: MediaQuery.of(context).size.height,
                   child: ListView.builder(
@@ -165,18 +152,14 @@ class _searchBeritaState extends State<searchBerita> {
                 );
               } else if (snapshot.hasError) {
                 return const Center(child: Text('Something went wrong'));
-              } else if (isLoading == true) {
+              } else if (!snapshot.hasData &&
+                  snapshot.connectionState == ConnectionState.done) {
                 return const Center(
-                  child: CircularProgressIndicator(),
-                );
-                // return Center(child: snapshot.status == false ? const Text("Article tidak ditemukan") : const CircularProgressIndicator());
-              } else if (articleList.isEmpty) {
-                return const Center(
-                  child: Text("Article tidak ditemukan "),
+                  child: Text("Data tidak ditemukan "),
                 );
               } else {
                 return const Center(
-                  child: Text("Terjadi kesalahan"),
+                  child: CircularProgressIndicator(),
                 );
               }
             },
