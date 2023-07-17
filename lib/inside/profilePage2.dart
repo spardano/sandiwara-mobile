@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'dart:convert';
 import 'dart:ffi';
 
@@ -8,20 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
-import 'package:sandiwara/controller/profile_controller.dart';
+import 'package:sandiwara/controller/ProfileController.dart';
 import 'package:sandiwara/inside/profilePage.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/providers/auth.dart';
 
-class profilePage extends StatefulWidget {
-  const profilePage({Key? key}) : super(key: key);
-
+class profilePage2 extends StatefulWidget {
+  const profilePage2({Key? key, required this.userDataStorage})
+      : super(key: key);
+  final userData userDataStorage;
   @override
-  State<profilePage> createState() => _profilePageState();
+  State<profilePage2> createState() => _profilePage2State();
 }
 
-class _profilePageState extends State<profilePage> {
-  late userData userDataStorage;
+class _profilePage2State extends State<profilePage2> {
   ProfileController profileController = Get.put(ProfileController());
 
   bool _switch1 = false;
@@ -32,10 +30,8 @@ class _profilePageState extends State<profilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _switch1 = userDataStorage.push_notif == 1 ? true : false;
-    _switch2 = userDataStorage!.email_news_sub == 1 ? true : false;
-
-    print(userDataStorage!.push_notif);
+    _switch1 = widget.userDataStorage.push_notif == 1 ? true : false;
+    _switch2 = widget.userDataStorage!.email_news_sub == 1 ? true : false;
   }
 
   @override
@@ -75,7 +71,10 @@ class _profilePageState extends State<profilePage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CardProfile(),
+                    CardProfile(
+                      email: 'Ridho Al Amzah',
+                      nama: 'ralamzah@gmail.com',
+                    ),
                     PanelProfile(),
                     Padding(
                       padding: EdgeInsets.all(12),

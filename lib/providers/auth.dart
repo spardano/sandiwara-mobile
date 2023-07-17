@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:sandiwara/bottomNavbar.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/inside/profilePage.dart';
-import 'package:sandiwara/models/userData.dart';
+import 'package:sandiwara/inside/profilePage2.dart';
+import 'package:sandiwara/models/user_data.dart';
+import 'package:sandiwara/pages/loginPage.dart';
 import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:sandiwara/utils/helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,8 +26,9 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = json.decode(response.body);
+        userData dataUser = userData.fromJson(data['user']);
         setLoginData(
-            data['access_token'], data['token'], data['id_user'], data['user']);
+            data['access_token'], data['token'], data['id_user'], dataUser);
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const bottomNavbar(),
         ));
@@ -32,6 +36,35 @@ class Auth with ChangeNotifier {
         helper.showScafoldMessage(
             context, json.decode(response.body)['message']);
         debugPrint(json.decode(response.body).toString());
+      }
+    } catch (e) {
+      isLoading.value = false;
+      helper.showScafoldMessage(context, e.toString());
+    }
+  }
+
+  Future changePassword(String? passwordLama, String? passwordBaru,
+      String? passwordKonfirmasi, context) async {
+    isLoading.value = true;
+    try {
+      var body = {
+        'password_lama': passwordLama,
+        'password_baru': passwordBaru,
+        'password_konfirmasi': passwordKonfirmasi
+      };
+
+      var response = await http.post(Uri.parse('$apiUrl/guest/change-password'),
+          body: body);
+
+      isLoading.value = false;
+      if (response.statusCode == 201) {
+        helper.showScafoldMessage(
+            context, json.decode(response.body)['message']);
+
+        getUser(context);
+      } else {
+        helper.showScafoldMessage(
+            context, json.decode(response.body)['message']);
       }
     } catch (e) {
       isLoading.value = false;
@@ -82,11 +115,9 @@ class Auth with ChangeNotifier {
   Future<void> setLoginData(
       String access_token, String token, int id_user, userData user) async {
     final bridge = await SharedPreferences.getInstance();
-
     if (bridge.containsKey('access_token')) {
       bridge.remove('access_token');
     }
-    ;
 
     if (bridge.containsKey('user')) {
       bridge.remove('user');
@@ -99,14 +130,13 @@ class Auth with ChangeNotifier {
   Future<void> clearDataLogin(context) async {
     isLoading.value = false;
     final bridge = await SharedPreferences.getInstance();
-
-    if (bridge.containsKey('data_login')) {
+    if (bridge.containsKey('access_token')) {
       bridge.clear();
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => bottomNavbar()),
-      );
     }
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const bottomNavbar()),
+    );
 
     isLoading.value = false;
   }
@@ -119,27 +149,28 @@ class Auth with ChangeNotifier {
         final user =
             jsonDecode(bridge.getString('user')!) as Map<String, dynamic>;
 
-        final userData user_data = userData.fromJson(user);
+        userData dataUser = userData.fromJson(user);
 
-        if (user_data != null) {
-          Navigator.of(context).push(
-            PageRouteBuilder(
-                pageBuilder: (_, __, ___) => profilePage(
-                      userDataStorage: user_data,
-                    ),
-                transitionDuration: Duration(milliseconds: 600),
-                transitionsBuilder:
-                    (_, Animation<double> animation, __, Widget child) {
-                  return Opacity(
-                    opacity: animation.value,
-                    child: child,
-                  );
-                }),
-          );
-        }
+        Navigator.of(context).push(
+          PageRouteBuilder(
+              pageBuilder: (_, __, ___) =>
+                  profilePage(userDataStorage: dataUser),
+              transitionDuration: const Duration(milliseconds: 600),
+              transitionsBuilder:
+                  (_, Animation<double> animation, __, Widget child) {
+                return Opacity(
+                  opacity: animation.value,
+                  child: child,
+                );
+              }),
+        );
+      } else {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ));
       }
     } catch (e) {
-      print(e.toString());
+      Helpers().showScafoldMessage(context, e.toString());
     }
   }
 }

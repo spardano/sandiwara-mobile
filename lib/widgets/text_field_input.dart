@@ -9,6 +9,10 @@ class TextFieldInput extends StatefulWidget {
     required this.validator,
     required this.obscureText,
     required this.sufixIcon,
+    required this.textColor,
+    required this.textHintColor,
+    required this.errorTextColor,
+    required this.sufixIconColor,
   }) : super(key: key);
 
   final TextEditingController controller;
@@ -18,6 +22,10 @@ class TextFieldInput extends StatefulWidget {
   final Function validator;
   late bool obscureText;
   final bool sufixIcon;
+  final Color textColor;
+  final Color textHintColor;
+  final Color errorTextColor;
+  final Color sufixIconColor;
 
   @override
   State<TextFieldInput> createState() => _TextFieldInputState();
@@ -36,17 +44,18 @@ class _TextFieldInputState extends State<TextFieldInput> {
         controller: widget.controller,
         validator: (value) => widget.validator(value),
         obscureText: widget.obscureText,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: widget.textColor),
         decoration: InputDecoration(
-          hintStyle: const TextStyle(color: Colors.white, fontFamily: "Sofia"),
-          errorStyle: TextStyle(color: Colors.orange[300], fontSize: 14.0),
+          hintStyle:
+              TextStyle(color: widget.textHintColor, fontFamily: "Sofia"),
+          errorStyle: TextStyle(color: widget.errorTextColor, fontSize: 14.0),
           suffixIcon: widget.sufixIcon
               ? IconButton(
                   icon: Icon(
                     widget.obscureText
                         ? Icons.visibility_off
                         : Icons.visibility,
-                    color: Colors.white,
+                    color: widget.sufixIconColor,
                   ),
                   onPressed: () {
                     // Update the state i.e. toogle the state of passwordVisible variable

@@ -24,7 +24,7 @@ class __LoginPageState extends State<LoginPage> {
   final Auth _authenticationController = Get.put(Auth());
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  AutovalidateMode _autovalidate = AutovalidateMode.always;
+  final AutovalidateMode _autovalidate = AutovalidateMode.onUserInteraction;
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +100,10 @@ class __LoginPageState extends State<LoginPage> {
                         child: Column(
                           children: [
                             TextFieldInput(
+                                sufixIconColor: Colors.white,
+                                errorTextColor: Colors.yellow,
+                                textColor: Colors.white,
+                                textHintColor: Colors.grey,
                                 sufixIcon: false,
                                 obscureText: false,
                                 controller: _emailController,
@@ -118,6 +122,10 @@ class __LoginPageState extends State<LoginPage> {
                                   return null;
                                 }),
                             TextFieldInput(
+                                sufixIconColor: Colors.white,
+                                errorTextColor: Colors.yellow,
+                                textColor: Colors.white,
+                                textHintColor: Colors.grey,
                                 sufixIcon: true,
                                 obscureText: true,
                                 controller: _passwordController,
