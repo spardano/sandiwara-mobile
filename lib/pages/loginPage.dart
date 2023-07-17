@@ -2,11 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:sandiwara/pages/registerPage.dart';
 import 'package:sandiwara/providers/auth.dart';
 import 'package:sandiwara/utils/helpers.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sandiwara/widgets/button_login.dart';
 import 'package:sandiwara/widgets/draw_clilp_2.dart';
 import 'package:sandiwara/widgets/draw_clip.dart';

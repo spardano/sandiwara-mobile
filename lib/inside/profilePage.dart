@@ -1,15 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:convert';
-import 'dart:ffi';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/controller/ProfileController.dart';
 import 'package:sandiwara/models/userData.dart';
-import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/providers/auth.dart';
 

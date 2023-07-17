@@ -23,8 +23,9 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = json.decode(response.body);
-        setLoginData(
-            data['access_token'], data['token'], data['id_user'], data['user']);
+        userData user = userData.fromJson(data['user']);
+
+        setLoginData(data['access_token'], data['token'], user);
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const bottomNavbar(),
         ));
@@ -52,8 +53,8 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = jsonDecode(response.body.toString());
-        setLoginData(
-            data['access_token'], data['token'], data['id_user'], data['user']);
+        userData user = userData.fromJson(data['user']);
+        setLoginData(data['access_token'], data['token'], data['user']);
 
         var res = jsonDecode(response.body);
         if (data['status']) {
@@ -80,13 +81,12 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> setLoginData(
-      String access_token, String token, int id_user, userData user) async {
+      String access_token, String token, userData user) async {
     final bridge = await SharedPreferences.getInstance();
 
     if (bridge.containsKey('access_token')) {
       bridge.remove('access_token');
     }
-    ;
 
     if (bridge.containsKey('user')) {
       bridge.remove('user');
@@ -100,7 +100,7 @@ class Auth with ChangeNotifier {
     isLoading.value = false;
     final bridge = await SharedPreferences.getInstance();
 
-    if (bridge.containsKey('data_login')) {
+    if (bridge.containsKey('access_token')) {
       bridge.clear();
       Navigator.push(
         context,
