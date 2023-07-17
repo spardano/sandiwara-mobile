@@ -52,10 +52,11 @@ class _homePageState extends State<homePage> {
                 children: [
                   WebView(
                     gestureNavigationEnabled: true,
-                    initialUrl: mainUrl + '/webview/home',
+                    initialUrl: '$mainUrl/webview/home',
                     javascriptMode: JavascriptMode.unrestricted,
-                    javascriptChannels:
-                        <JavascriptChannel>[_jsDataCallback(context)].toSet(),
+                    javascriptChannels: <JavascriptChannel>{
+                      _jsDataCallback(context)
+                    },
                     gestureRecognizers: {
                       Factory<VerticalDragGestureRecognizer>(
                           () => VerticalDragGestureRecognizer()

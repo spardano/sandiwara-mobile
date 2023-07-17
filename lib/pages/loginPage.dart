@@ -1,43 +1,34 @@
 // ignore_for_file: sort_child_properties_last, prefer_const_constructors
 
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:sandiwara/bottomNavbar.dart';
-import 'package:sandiwara/constant.dart';
-import 'package:sandiwara/menu/homePage.dart';
 import 'package:sandiwara/pages/registerPage.dart';
 import 'package:sandiwara/providers/auth.dart';
-import 'package:sandiwara/utils/authentication.dart';
-import 'package:sandiwara/widgets/googleSignInButton.dart';
+import 'package:sandiwara/utils/helpers.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:sandiwara/widgets/button_login.dart';
+import 'package:sandiwara/widgets/draw_clilp_2.dart';
+import 'package:sandiwara/widgets/draw_clip.dart';
+import 'package:sandiwara/widgets/text_field_input.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginPage> createState() => __LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-  Map<String?, String?> _loginObject = Map<String?, String?>();
-
-  //create a TexteditingController
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+class __LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Auth _authenticationController = Get.put(Auth());
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   AutovalidateMode _autovalidate = AutovalidateMode.always;
-  String? pass;
-  bool _passwordVisible = true;
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -108,73 +99,75 @@ class _LoginPageState extends State<LoginPage> {
                         autovalidateMode: _autovalidate,
                         child: Column(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: _buildEmailField,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: _buildPasswordField,
-                            ),
+                            TextFieldInput(
+                                sufixIcon: false,
+                                obscureText: false,
+                                controller: _emailController,
+                                hintText: "Masukkan email",
+                                icon: Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                ),
+                                validator: (value) {
+                                  RegExp regex = RegExp(r'\w+@\w+\.\w+');
+                                  if (value == null) {
+                                    return 'Email harus diisikan';
+                                  } else if (!regex.hasMatch(value)) {
+                                    return 'Masukkan email yang valid';
+                                  }
+                                  return null;
+                                }),
+                            TextFieldInput(
+                                sufixIcon: true,
+                                obscureText: true,
+                                controller: _passwordController,
+                                hintText: "Masukkan Password",
+                                icon: Icon(
+                                  Icons.key,
+                                  color: Colors.white,
+                                ),
+                                validator: (value) {
+                                  RegExp hasUpper = RegExp(r'[A-Z]');
+                                  RegExp hasLower = RegExp(r'[a-z]');
+                                  RegExp hasDigit = RegExp(r'\d');
+                                  RegExp hasPunct = RegExp(r'[!@#\$&*~-]');
+
+                                  if (!RegExp(r'.{8,}').hasMatch(value!)) {
+                                    return 'Password harus minimal 8 karakter';
+                                  }
+                                  if (!hasDigit.hasMatch(value)) {
+                                    return 'Passwords harus berisi satu buah angka';
+                                  }
+                                }),
                           ],
                         ),
                       ),
-
                       const SizedBox(
                         height: 25,
                       ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(25),
-                        child: Container(
-                          width: 280,
-                          child: Stack(
-                            children: <Widget>[
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: <Color>[
-                                        Color(0xFF0D47A1),
-                                        Color(0xFF1976D2),
-                                        Color(0xFF42A5F5),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              TextButton(
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.all(16.0),
-                                  textStyle: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  _doLogin();
-                                },
-                                child: const Center(child: Text('Login')),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      ButtonLogin(onPress: () {
+                        if (_emailController.text.isEmpty) {
+                          Helpers().showScafoldMessage(
+                              context, "Email tidak boleh kosong");
+                        } else if (!_emailController.text.isEmail) {
+                          Helpers().showScafoldMessage(
+                              context, "Email tidak valid !");
+                        } else if (_passwordController.text.isEmpty) {
+                          Helpers().showScafoldMessage(
+                              context, "Password tidak boleh kosong");
+                        } else if (_passwordController.text.length < 8) {
+                          Helpers().showScafoldMessage(
+                              context, "Password harus minimal 8 karakter");
+                        } else {
+                          _authenticationController.signIn(
+                              context,
+                              _emailController.text.trim(),
+                              _passwordController.text.trim());
+                        }
+                      }),
                       const SizedBox(
-                        height: 20,
+                        height: 30,
                       ),
-                      // const Text("Forgot your password?",
-                      //     style: TextStyle(
-                      //         fontFamily: "Sofia",
-                      //         fontWeight: FontWeight.bold,
-                      //         color: Colors.white)),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 540.0),
-                  child: Column(
-                    children: [
                       const Text(
                         "Belum memiliki akun ?",
                         style: TextStyle(
@@ -185,11 +178,12 @@ class _LoginPageState extends State<LoginPage> {
                       Center(
                         child: TextButton(
                           onPressed: () {
-                            //register
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => registerPage()));
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const registerPage(),
+                              ),
+                            );
                           },
                           child: const Text(
                             "Daftar Akun",
@@ -199,213 +193,15 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                      )
-                      // Padding(
-                      //   padding: const EdgeInsets.symmetric(
-                      //       vertical: 20, horizontal: 20),
-                      //   child: Row(
-                      //     children: [
-                      //       FutureBuilder(
-                      //         future: Authentication.initializeFirebase(
-                      //             context: context),
-                      //         builder: (context, snapshot) {
-                      //           if (snapshot.hasError) {
-                      //             return Text('Error initializing Firebase');
-                      //           } else if (snapshot.connectionState ==
-                      //               ConnectionState.done) {
-                      //             return googleSignInButton();
-                      //           }
-                      //           return const CircularProgressIndicator(
-                      //             valueColor: AlwaysStoppedAnimation<Color>(
-                      //               Colors.red,
-                      //             ),
-                      //           );
-                      //         },
-                      //       ),
-                      //       const SizedBox(width: 12),
-                      //       Expanded(
-                      //         child: AppOutlineButton(
-                      //           asset: "assets/images/facebook.png",
-                      //           onTap: () {},
-                      //         ),
-                      //       ),
-                      //       const SizedBox(width: 12),
-                      //     ],
-                      //   ),
-                      // ),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: const [
-                      //     Text("Don't have an account? ",
-                      //         style: TextStyle(
-                      //             fontFamily: "Sofia",
-                      //             fontWeight: FontWeight.bold,
-                      //             color: Colors.blueGrey)),
-                      //     SizedBox(
-                      //       width: 10,
-                      //     ),
-                      //     Text("Sign Up",
-                      //         style: TextStyle(
-                      //             fontFamily: "Sofia",
-                      //             fontWeight: FontWeight.bold,
-                      //             color: Colors.blueGrey))
-                      //   ],
-                      // )
+                      ),
                     ],
                   ),
                 ),
               ],
-            ),
+            )
           ],
         ),
       ),
-    );
-  }
-
-  Widget get _buildEmailField {
-    return TextFormField(
-      onSaved: (String? val) {
-        _loginObject['email'] = val;
-      },
-      validator: (val) {
-        RegExp regex = RegExp(r'\w+@\w+\.\w+');
-        if (val == null)
-          return 'Emaril harus diisikan';
-        else if (!regex.hasMatch(val)) return 'Masukkan email yang valid';
-      },
-      style: TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintStyle: TextStyle(color: Colors.white, fontFamily: "Sofia"),
-        errorStyle: TextStyle(color: Colors.orange[300], fontSize: 14.0),
-        hintText: 'Masukkan email',
-        icon: Icon(Icons.person, color: Colors.white),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        border: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-      ),
-    );
-  }
-
-  Widget get _buildPasswordField {
-    return TextFormField(
-      obscureText: _passwordVisible,
-      style: TextStyle(color: Colors.white),
-      onChanged: (String val) => setState(() => pass = val),
-      onSaved: (String? val) => _loginObject['password'] = val,
-      validator: (String? val) {
-        RegExp hasUpper = RegExp(r'[A-Z]');
-        RegExp hasLower = RegExp(r'[a-z]');
-        RegExp hasDigit = RegExp(r'\d');
-        RegExp hasPunct = RegExp(r'[!@#\$&*~-]');
-
-        if (!RegExp(r'.{8,}').hasMatch(val!))
-          return 'Password harus minimal 8 karakter';
-        if (!hasDigit.hasMatch(val))
-          return 'Passwords harus berisi satu buah angka';
-      },
-      decoration: InputDecoration(
-        hintText: 'Masukkan Password',
-        hintStyle: const TextStyle(color: Colors.white, fontFamily: "Sofia"),
-        icon: const Icon(Icons.lock, color: Colors.white),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _passwordVisible ? Icons.visibility : Icons.visibility_off,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            // Update the state i.e. toogle the state of passwordVisible variable
-            setState(() {
-              _passwordVisible = !_passwordVisible;
-            });
-          },
-        ),
-        errorStyle: TextStyle(color: Colors.orange[300], fontSize: 14.0),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-        border: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.white),
-        ),
-      ),
-    );
-  }
-
-  void _doLogin() async {
-    setState(() => _autovalidate = AutovalidateMode.always);
-
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-
-      try {
-        Provider.of<Auth>(context, listen: false)
-            .signIn(_loginObject['email'], _loginObject['password'], context);
-      } catch (err) {
-        print(err);
-      }
-    }
-  }
-}
-
-class DrawClip extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height * 0.80);
-    path.cubicTo(size.width / 4, size.height, 3 * size.width / 4,
-        size.height / 2, size.width, size.height * 0.8);
-    path.lineTo(size.width, 0);
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    return true;
-  }
-}
-
-class DrawClip2 extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height * 0.08);
-    path.cubicTo(size.width / 4, size.height, 3 * size.width / 4,
-        size.height / 2, size.width, size.height * 0.9);
-    path.lineTo(size.width, 0);
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    return true;
-  }
-}
-
-class AppOutlineButton extends StatelessWidget {
-  final String asset;
-  final VoidCallback onTap;
-
-  AppOutlineButton({required this.asset, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Image.asset(
-          asset,
-          height: 24,
-        ),
-      ),
-      onPressed: onTap,
     );
   }
 }

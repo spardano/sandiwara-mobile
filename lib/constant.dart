@@ -3,13 +3,12 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-const String apiUrl = 'http://192.168.100.86:8000/api';
-const String mainUrl = 'http://192.168.100.86:8000';
-// const String apiUrl = 'https://sandiwara.id/api';
-// const String mainUrl = 'https://sandiwara.id';
+const String apiUrl = 'http://192.168.43.100:8000/api';
+const String mainUrl = 'http://192.168.43.100:8000';
 
 InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
   crossPlatform: InAppWebViewOptions(
@@ -58,3 +57,9 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   importance: Importance.high,
   playSound: true,
 );
+
+const textStyleTitle = TextStyle(
+    color: Colors.black54, fontWeight: FontWeight.w700, fontSize: 15.0);
+
+const textStyleDeskripsi =
+    TextStyle(color: Colors.black26, fontWeight: FontWeight.w400);

@@ -7,6 +7,7 @@ import 'package:sandiwara/bottomNavbar.dart';
 import 'package:sandiwara/pages/loginPage.dart';
 import 'package:sandiwara/topBar.dart';
 import 'package:sandiwara/utils/authentication.dart';
+import 'package:sandiwara/widgets/app_outline_button.dart';
 
 class googleSignInButton extends StatefulWidget {
   const googleSignInButton({super.key});
