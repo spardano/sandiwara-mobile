@@ -1,29 +1,24 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sort_child_properties_last, prefer_collection_literals
 
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:comment_box/comment/comment.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/menu/mySliverAppBar.dart';
 import 'package:sandiwara/models/commentArticle.dart';
 import 'package:sandiwara/models/detailArticle.dart';
-import 'package:sandiwara/models/newsHeaderModel.dart';
-import 'package:sandiwara/pages/loginPage.dart';
 import 'package:sandiwara/providers/article.dart';
 import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:sandiwara/widgets/customTag.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:http/http.dart' as http;
 
 class headerSliderDetail extends StatefulWidget {
-  detailArticle? detail_article;
+  final detailArticle? detail_article;
 
-  headerSliderDetail({Key? key, this.detail_article}) : super(key: key);
+  const headerSliderDetail({Key? key, this.detail_article}) : super(key: key);
 
   _headerSliderDetailState createState() =>
       _headerSliderDetailState(detail_article);
@@ -50,12 +45,15 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
 
   void checkToken() async {
     final bridge = await SharedPreferences.getInstance();
-    if (bridge.containsKey('data_login')) {
-      final data =
-          jsonDecode(bridge.getString('data_login')!) as Map<String, dynamic>;
+    if (bridge.containsKey('access_token')) {
+      var data_token = bridge.getString('access_token');
+      token = data_token.toString();
       isAuthenticated = true;
-      token = data['access_token'];
-      id_user = int.parse(data['id_user']);
+    }
+
+    if (bridge.containsKey('user')) {
+      final user = jsonDecode(bridge.getString('user')!);
+      id_user = int.parse(user['id']);
     }
   }
 
@@ -68,7 +66,6 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
-        print('status comments :${data['status']}');
 
         for (Map<String, dynamic> item in data['data']) {
           commentsData.add(commentArticle.fromJson(item));
@@ -90,7 +87,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
             child: ListTile(
               leading: GestureDetector(
                 onTap: () async {
-                  print("Comment Clicked");
+                  // print("Comment Clicked");
                 },
                 child: Container(
                   height: 50.0,
@@ -122,37 +119,9 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
 
   @override
   Widget build(BuildContext context) {
-    double _fullHeight = MediaQuery.of(context).size.height;
-    double _webviewHeight;
-
     /// Hero animation for image
-    final hero = Hero(
-      tag: 'hero-tag-${detail_article!.id}',
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            image: NetworkImage(detail_article!.image!),
-          ),
-          shape: BoxShape.rectangle,
-        ),
-        child: Container(
-          margin: EdgeInsets.only(top: 130.0),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: FractionalOffset.bottomCenter,
-              end: FractionalOffset.topCenter,
-              colors: [
-                const Color(0xFF000000),
-                const Color(0x00000000),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
 
-    double _height = MediaQuery.of(context).size.height;
+    double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
         body: SafeArea(
@@ -161,7 +130,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
             slivers: <Widget>[
               SliverPersistentHeader(
                   delegate: MySliverAppBar(
-                      expandedHeight: _height - 0.0,
+                      expandedHeight: height - 0.0,
                       img: detail_article!.image,
                       id: detail_article!.id,
                       title: detail_article!.title,
@@ -221,7 +190,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                             width: 10.0,
                           ),
                           Text(
-                            detail_article!.jumlahView!.toString() + " Pembaca",
+                            "${detail_article!.jumlahView!.toString()} Pembaca",
                             style: TextStyle(
                               color: Colors.white,
                             ),
@@ -234,7 +203,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                 Padding(
                   padding: const EdgeInsets.only(
                       left: 20.0, right: 20.0, bottom: 20.0),
-                  child: Container(
+                  child: SizedBox(
                     width: MediaQuery.of(context).size.width - 30,
                     child: Text(
                       detail_article!.title!,
@@ -254,7 +223,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                         padding: const EdgeInsets.only(
                             top: 10.0, left: 20.0, right: 20.0, bottom: 10.0),
                         child: Text(
-                          item!.desc!,
+                          item.desc!,
                           style: TextStyle(
                               fontFamily: "Sofia",
                               color: Colors.black,
@@ -272,8 +241,6 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () async {
-                                      print(detail_article!.url_source!
-                                          .toString());
                                       final Uri url = Uri.parse(
                                           detail_article!.url_source!);
                                       if (!await launchUrl(url)) {
@@ -348,62 +315,58 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                             bottom: MediaQuery.of(context).viewInsets.bottom),
                         child: SizedBox(
                             height: 500,
-                            child: Container(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 30.0),
-                                child: CommentBox(
-                                  userImage: CommentBox.commentImageParser(
-                                      imageURLorPath:
-                                          "assets/images/avatar.png"),
-                                  child: isCommentListShow
-                                      ? commentChild(commentList)
-                                      : Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child:
-                                              Text("Belum ada data komentar"),
-                                        ),
-                                  labelText: 'Tulis Komentar...',
-                                  errorText: 'Komentar tidak boleh kosong',
-                                  withBorder: false,
-                                  formKey: formKey,
-                                  commentController: commentController,
-                                  sendButtonMethod: () {
-                                    if (isAuthenticated) {
-                                      if (formKey.currentState!.validate()) {
-                                        Provider.of<Article>(context,
-                                                listen: false)
-                                            .saveComment(
-                                                id_user,
-                                                this.detail_article!.id!,
-                                                commentController.text,
-                                                token);
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 30.0),
+                              child: CommentBox(
+                                userImage: CommentBox.commentImageParser(
+                                    imageURLorPath: "assets/images/avatar.png"),
+                                child: isCommentListShow
+                                    ? commentChild(commentList)
+                                    : Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Text("Belum ada data komentar"),
+                                      ),
+                                labelText: 'Tulis Komentar...',
+                                errorText: 'Komentar tidak boleh kosong',
+                                withBorder: false,
+                                formKey: formKey,
+                                commentController: commentController,
+                                sendButtonMethod: () {
+                                  if (isAuthenticated) {
+                                    if (formKey.currentState!.validate()) {
+                                      Provider.of<Article>(context,
+                                              listen: false)
+                                          .saveComment(
+                                              id_user,
+                                              detail_article!.id!,
+                                              commentController.text,
+                                              token);
 
-                                        Navigator.pop(context);
-                                        setState(() {
-                                          print('update comment');
-                                          getComments();
-                                        });
-                                        commentController.clear();
-                                        FocusScope.of(context).unfocus();
-                                      } else {
-                                        print("Not validated");
-                                      }
+                                      Navigator.pop(context);
+                                      setState(() {
+                                        print('update comment');
+                                        getComments();
+                                      });
+                                      commentController.clear();
+                                      FocusScope.of(context).unfocus();
                                     } else {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) => customDialog(
-                                                header: 'Peringantan',
-                                                text:
-                                                    'Anda harus login untuk melanjutkan!',
-                                                type: 'warning',
-                                              ));
+                                      print("Not validated");
                                     }
-                                  },
-                                  backgroundColor: Colors.red[600],
-                                  textColor: Colors.white,
-                                  sendWidget: Icon(Icons.send_sharp,
-                                      size: 30, color: Colors.white),
-                                ),
+                                  } else {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) => customDialog(
+                                              header: 'Peringantan',
+                                              text:
+                                                  'Anda harus login untuk melanjutkan!',
+                                              type: 'warning',
+                                            ));
+                                  }
+                                },
+                                backgroundColor: Colors.red[600],
+                                textColor: Colors.white,
+                                sendWidget: Icon(Icons.send_sharp,
+                                    size: 30, color: Colors.white),
                               ),
                             )),
                       );
@@ -415,162 +378,4 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
           ),
         ));
   }
-}
-
-class MySliverAppBar extends SliverPersistentHeaderDelegate {
-  final double expandedHeight;
-
-  String? img, id, title, category, author;
-
-  MySliverAppBar(
-      {required this.expandedHeight,
-      this.img,
-      this.id,
-      this.title,
-      this.category,
-      this.author});
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    double c_width = MediaQuery.of(context).size.width * 0.6;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(
-          height: 50.0,
-          width: double.infinity,
-          color: Color(0xFF172E4D),
-        ),
-        Opacity(
-          opacity: (1 - shrinkOffset / expandedHeight),
-          child: Hero(
-            transitionOnUserGestures: true,
-            tag: 'hero-tag-${id}',
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.red[600],
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: NetworkImage(img!),
-                ),
-                shape: BoxShape.rectangle,
-              ),
-              child: Container(
-                margin: EdgeInsets.only(top: 130.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: FractionalOffset.bottomCenter,
-                    end: FractionalOffset.topCenter,
-                    colors: <Color>[
-                      const Color(0xFF000000),
-                      const Color(0x00000000),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Opacity(
-            opacity: (1 - shrinkOffset / expandedHeight),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-                  child: CustomTag(
-                    backgroundColor: Colors.grey.withAlpha(150),
-                    children: [
-                      Text(
-                        category!,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: Colors.white),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 10.0,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width - 30,
-                    child: Text(
-                      title!,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 25,
-                          fontFamily: "Popins",
-                          fontWeight: FontWeight.w700),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10.0,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Container(
-                    child: Text(
-                      author!,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.5,
-                          fontFamily: "Popins",
-                          fontWeight: FontWeight.w400),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            InkWell(
-              onTap: () {
-                Navigator.of(context).pop();
-              },
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20.0, left: 15.0),
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 25.0,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 36.0,
-            )
-          ],
-        ),
-      ],
-    );
-  }
-
-  @override
-  double get maxExtent => expandedHeight;
-
-  @override
-  double get minExtent => kToolbarHeight;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) => true;
 }

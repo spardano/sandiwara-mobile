@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/providers/article.dart';
@@ -69,8 +67,7 @@ class _categoryBeritaState extends State<categoryBerita> {
               return NavigationDecision.navigate;
             },
             javascriptMode: JavascriptMode.unrestricted,
-            javascriptChannels:
-                <JavascriptChannel>[_jsDataCallback(context)].toSet(),
+            javascriptChannels: <JavascriptChannel>{_jsDataCallback(context)},
             onPageStarted: (String url) {
               setState(() {
                 isLoading =

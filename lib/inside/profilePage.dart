@@ -1,20 +1,39 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+import 'dart:ffi';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:sandiwara/controller/ProfileController.dart';
+import 'package:sandiwara/models/userData.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/providers/auth.dart';
 
 class profilePage extends StatefulWidget {
-  const profilePage({super.key});
+  const profilePage({Key? key, required this.userDataStorage})
+      : super(key: key);
 
+  final userData userDataStorage;
   @override
-  State<profilePage> createState() => _profilePageState();
+  State<profilePage> createState() => _profilePageState(userDataStorage);
 }
 
 class _profilePageState extends State<profilePage> {
+  userData userDataStorage;
+
+  _profilePageState(this.userDataStorage);
+
   int tapvalue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +71,11 @@ class _profilePageState extends State<profilePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const <Widget>[
+                  children: <Widget>[
                     CardProfile(),
-                    PanelProfile(),
+                    PanelProfile(
+                      userDataStorage: userDataStorage,
+                    ),
                   ],
                 ),
               ),
@@ -146,16 +167,34 @@ class _profilePageState extends State<profilePage> {
 }
 
 class PanelProfile extends StatefulWidget {
-  const PanelProfile({
-    Key? key,
-  }) : super(key: key);
+  final userData userDataStorage;
+
+  const PanelProfile({Key? key, required this.userDataStorage})
+      : super(key: key);
 
   @override
-  State<PanelProfile> createState() => _PanelProfileState();
+  State<PanelProfile> createState() => _PanelProfileState(userDataStorage);
 }
 
 class _PanelProfileState extends State<PanelProfile> {
+  userData? userDataStorage;
   bool switch2 = false;
+  ProfileController profileController = Get.put(ProfileController());
+
+  _PanelProfileState(this.userDataStorage);
+
+  bool _switch1 = false;
+  bool _switch2 = false;
+  int tapvalue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _switch1 = userDataStorage!.push_notif == 1 ? true : false;
+    _switch2 = userDataStorage!.email_news_sub == 1 ? true : false;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -191,16 +230,18 @@ class _PanelProfileState extends State<PanelProfile> {
             children: <Widget>[
               Text("Notifikasi", style: textStyleTitle),
               Switch(
-                value: switch2,
-                onChanged: (bool e) => setState(() {
-                  if (e) {
-                    e = true;
-                    switch2 = true;
-                  } else {
-                    e = false;
-                    switch2 = false;
-                  }
-                }),
+                value: _switch1,
+                onChanged: (bool e) => {
+                  setState(() {
+                    if (e) {
+                      e = true;
+                      _switch1 = true;
+                    } else {
+                      e = false;
+                      _switch1 = false;
+                    }
+                  })
+                },
                 activeColor: Colors.lightBlueAccent,
                 inactiveTrackColor: Colors.black12,
               ),

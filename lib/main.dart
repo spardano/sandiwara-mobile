@@ -194,7 +194,7 @@ class _MyAppState extends State<MyApp> {
           create: (ctx) => Article(),
         ),
       ],
-      builder: (context, child) => const MaterialApp(
+      builder: (context, child) => const GetMaterialApp(
         title: 'Sandiwara News',
         debugShowCheckedModeBanner: false,
         home: bottomNavbar(),

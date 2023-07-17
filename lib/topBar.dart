@@ -3,8 +3,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/menu/homePage.dart';
 import 'package:sandiwara/inside/profilePage.dart';
@@ -12,6 +10,7 @@ import 'package:sandiwara/pages/loginPage.dart';
 import 'package:sandiwara/providers/auth.dart';
 import 'package:sandiwara/topMenu/terkiniPage.dart';
 import 'package:sandiwara/topMenu/trendingPage.dart';
+import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class topBar extends StatefulWidget {
@@ -23,19 +22,16 @@ class topBar extends StatefulWidget {
 
 class _topBarState extends State<topBar> {
   bool isAuthenticated = false;
-  String? token = null;
+  String? token;
 
   Future<void> getToken() async {
     final bridge = await SharedPreferences.getInstance();
 
-    if (bridge.containsKey('data_login') &&
-        bridge.getString('data_login') != null) {
-      final myData =
-          jsonDecode(bridge.getString('data_login')!) as Map<String, dynamic>;
-
-      if (myData['access_token'] != null) {
+    if (bridge.containsKey('access_token') &&
+        bridge.getString('access_token') != null) {
+      final token = bridge.getString('access_token');
+      if (token != null) {
         isAuthenticated = true;
-        token = myData['access_token'];
       }
     }
   }
@@ -74,14 +70,21 @@ class _topBarState extends State<topBar> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
+                                    builder: (context) => const LoginPage()),
                               );
                             } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => profilePage()),
-                              );
+                              try {
+                                Provider.of<Auth>(context, listen: false)
+                                    .getUser(context);
+                              } catch (err) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => const customDialog(
+                                          header: 'Gagal',
+                                          text: 'Gagal Menampilkan data',
+                                          type: 'warning',
+                                        ));
+                              }
                             }
                           },
                           child: isAuthenticated == false

@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-const String apiUrl = 'http://192.168.43.100:8000/api';
-const String mainUrl = 'http://192.168.43.100:8000';
+const String apiUrl = 'http://192.168.100.86:8000/api';
+const String mainUrl = 'http://192.168.100.86:8000';
+// const String apiUrl = 'https://sandiwara.id/api';
+// const String mainUrl = 'https://sandiwara.id';
 
 InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
   crossPlatform: InAppWebViewOptions(

@@ -8,7 +8,6 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/models/articleList.dart';
-import 'package:sandiwara/models/news.dart';
 import 'package:sandiwara/providers/article.dart';
 import 'package:sandiwara/utils/helpers.dart';
 import 'package:sandiwara/widgets/card_news.dart';

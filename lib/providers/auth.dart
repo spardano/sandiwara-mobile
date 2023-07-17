@@ -5,6 +5,9 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:sandiwara/bottomNavbar.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/inside/profilePage.dart';
+import 'package:sandiwara/models/userData.dart';
+import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:sandiwara/utils/helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +23,8 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = json.decode(response.body);
-        setLoginData(data['access_token'], data['token'], data['id_user']);
+        setLoginData(
+            data['access_token'], data['token'], data['id_user'], data['user']);
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const bottomNavbar(),
         ));
@@ -48,7 +52,8 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = jsonDecode(response.body.toString());
-        setLoginData(data['access_token'], data['token'], data['id_user']);
+        setLoginData(
+            data['access_token'], data['token'], data['id_user'], data['user']);
 
         var res = jsonDecode(response.body);
         if (data['status']) {
@@ -74,37 +79,21 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future setLoginData(String accessToken, String token, int idUser) async {
-    isLoading.value = true;
+  Future<void> setLoginData(
+      String access_token, String token, int id_user, userData user) async {
     final bridge = await SharedPreferences.getInstance();
 
-    final myData = jsonEncode({
-      'access_token': accessToken.toString(),
-      'token': token.toString(),
-      'id_user': idUser.toString()
-    });
+    if (bridge.containsKey('access_token')) {
+      bridge.remove('access_token');
+    }
+    ;
 
-    if (bridge.containsKey('data_login')) {
-      bridge.clear();
+    if (bridge.containsKey('user')) {
+      bridge.remove('user');
     }
 
-    bridge.setString('data_login', myData);
-    isLoading.value = false;
-  }
-
-  Future<String?> getToken() async {
-    isLoading.value = true;
-    final bridge = await SharedPreferences.getInstance();
-
-    if (bridge.containsKey('data_login') &&
-        bridge.getString('data_login') != null) {
-      final myData =
-          jsonDecode(bridge.getString('data_login')!) as Map<String, dynamic>;
-      isLoading.value = false;
-      return myData['access_token'];
-    }
-    isLoading.value = true;
-    return null;
+    bridge.setString('access_token', access_token.toString());
+    bridge.setString('user', userData.encode(user));
   }
 
   Future<void> clearDataLogin(context) async {
@@ -120,5 +109,37 @@ class Auth with ChangeNotifier {
     }
 
     isLoading.value = false;
+  }
+
+  void getUser(context) async {
+    try {
+      final bridge = await SharedPreferences.getInstance();
+
+      if (bridge.containsKey('user') && bridge.getString('user') != null) {
+        final user =
+            jsonDecode(bridge.getString('user')!) as Map<String, dynamic>;
+
+        final userData user_data = userData.fromJson(user);
+
+        if (user_data != null) {
+          Navigator.of(context).push(
+            PageRouteBuilder(
+                pageBuilder: (_, __, ___) => profilePage(
+                      userDataStorage: user_data,
+                    ),
+                transitionDuration: Duration(milliseconds: 600),
+                transitionsBuilder:
+                    (_, Animation<double> animation, __, Widget child) {
+                  return Opacity(
+                    opacity: animation.value,
+                    child: child,
+                  );
+                }),
+          );
+        }
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }
