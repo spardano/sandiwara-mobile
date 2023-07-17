@@ -2,20 +2,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
-import 'package:sandiwara/menu/detailArticle.dart';
-import 'package:sandiwara/menu/news_header_slider_detail.dart';
-import 'package:sandiwara/models/detailArticle.dart';
-import 'package:sandiwara/models/newsHeaderModel.dart';
 import 'package:sandiwara/providers/article.dart';
-import 'package:sandiwara/providers/auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'dart:io' show Platform;
 
 class homePage extends StatefulWidget {
   const homePage({super.key});
@@ -26,7 +17,7 @@ class homePage extends StatefulWidget {
 
 class _homePageState extends State<homePage> {
   final GlobalKey webViewKey = GlobalKey();
-  String? id_user = null;
+  String? id_user;
 
   late WebViewController controller;
   double progress = 0;
@@ -52,10 +43,11 @@ class _homePageState extends State<homePage> {
                 children: [
                   WebView(
                     gestureNavigationEnabled: true,
-                    initialUrl: mainUrl + '/webview/home',
+                    initialUrl: '$mainUrl/webview/home',
                     javascriptMode: JavascriptMode.unrestricted,
-                    javascriptChannels:
-                        <JavascriptChannel>[_jsDataCallback(context)].toSet(),
+                    javascriptChannels: <JavascriptChannel>{
+                      _jsDataCallback(context)
+                    },
                     gestureRecognizers: {
                       Factory<VerticalDragGestureRecognizer>(
                           () => VerticalDragGestureRecognizer()
@@ -100,20 +92,23 @@ class _homePageState extends State<homePage> {
     return JavascriptChannel(
         name: 'DataCallback',
         onMessageReceived: (JavascriptMessage message) {
-          print(message);
           _doDirectToDetailPage(context, message.message);
         });
   }
 
   _doDirectToDetailPage(BuildContext context, String textData) {
     final slug = jsonDecode(textData) as Map<String, dynamic>;
-    print(slug['slug_article']);
-
     try {
       Provider.of<Article>(context, listen: false)
           .getDetailArtikel(context, slug['slug_article']);
     } catch (err) {
-      print(err);
+      showDialog(
+          context: context,
+          builder: (context) => customDialog(
+                header: 'Gagal',
+                text: err.toString(),
+                type: 'warning',
+              ));
     }
   }
 }

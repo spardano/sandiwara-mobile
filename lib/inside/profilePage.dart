@@ -1,32 +1,50 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
+import 'dart:ffi';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sandiwara/controller/ProfileController.dart';
+import 'package:sandiwara/models/userData.dart';
 import 'package:sandiwara/providers/auth.dart';
 
 class profilePage extends StatefulWidget {
-  const profilePage({super.key});
+  const profilePage({Key? key, required this.userDataStorage})
+      : super(key: key);
 
+  final userData userDataStorage;
   @override
-  State<profilePage> createState() => _profilePageState();
+  State<profilePage> createState() => _profilePageState(userDataStorage);
 }
 
 class _profilePageState extends State<profilePage> {
+  ProfileController profileController = Get.put(ProfileController());
+
+  userData? userDataStorage;
+
+  _profilePageState(this.userDataStorage);
+
   bool _switch1 = false;
   bool _switch2 = false;
   int tapvalue = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _switch1 = userDataStorage!.push_notif == 1 ? true : false;
+    _switch2 = userDataStorage!.email_news_sub == 1 ? true : false;
+
+    print(userDataStorage!.push_notif);
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF9F9F9),
-
-      ///
-      /// Appbar
-      ///
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
@@ -104,11 +122,10 @@ class _profilePageState extends State<profilePage> {
                         Container(
                           height: 60.0,
                           width: 60.0,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             color: Colors.white,
                             image: DecorationImage(
-                                image: NetworkImage(
-                                    "https://images.pexels.com/photos/3541390/pexels-photo-3541390.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"),
+                                image: AssetImage("assets/images/avatar.png"),
                                 fit: BoxFit.cover),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(50.0)),
@@ -117,16 +134,16 @@ class _profilePageState extends State<profilePage> {
                         const SizedBox(
                           height: 12.0,
                         ),
-                        const Text(
-                          "Jipau Developer",
+                        Text(
+                          userDataStorage!.name!,
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontFamily: "Popins",
                               color: Colors.white,
                               letterSpacing: 1.5),
                         ),
-                        const Text(
-                          "Jipaudev@gmail.com",
+                        Text(
+                          userDataStorage!.email!,
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w200,
@@ -173,8 +190,8 @@ class _profilePageState extends State<profilePage> {
                     children: <Widget>[
                       Text("Notifikasi", style: _txtStyleTitle),
                       Switch(
-                        value: _switch2,
-                        onChanged: (bool e) => _something2(e),
+                        value: _switch1,
+                        onChanged: (bool e) => _something(e),
                         activeColor: Colors.lightBlueAccent,
                         inactiveTrackColor: Colors.black12,
                       ),
@@ -187,6 +204,21 @@ class _profilePageState extends State<profilePage> {
                     height: 15.0,
                   ),
                   _line(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text("Berlangganan Email", style: _txtStyleTitle),
+                      Switch(
+                        value: _switch2,
+                        onChanged: (bool e) => _something2(e),
+                        activeColor: Colors.lightBlueAccent,
+                        inactiveTrackColor: Colors.black12,
+                      ),
+                    ],
+                  ),
+                  Text(
+                      "Izinkan untuk mendapatkan email berita terbaru secara berkala",
+                      style: _txtStyleDeskripsi),
                   SizedBox(
                     height: 15.0,
                   ),
@@ -298,12 +330,11 @@ class _profilePageState extends State<profilePage> {
         e = false;
         _switch1 = false;
       }
+
+      profileController.updateNotificationStatus(_switch1);
     });
   }
 
-  ///
-  /// void for radio button notifications
-  ///
   void _something2(bool e) {
     setState(() {
       if (e) {
@@ -313,6 +344,7 @@ class _profilePageState extends State<profilePage> {
         e = false;
         _switch2 = false;
       }
+      profileController.updateEmailSubsStatus(_switch2);
     });
   }
 }

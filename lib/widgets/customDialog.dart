@@ -9,12 +9,17 @@ import 'package:sandiwara/pages/loginPage.dart';
 
 class customDialog extends StatelessWidget {
   const customDialog(
-      {Key? key, required this.header, required this.text, required this.type})
+      {Key? key,
+      required this.header,
+      required this.text,
+      required this.type,
+      this.direction})
       : super(key: key);
 
   final String text;
   final String type;
   final String header;
+  final String? direction;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +31,7 @@ class customDialog extends StatelessWidget {
             text: text,
             type: type,
             header: header,
+            direction: direction ?? 'none',
           ),
           Positioned(
             top: 0,
@@ -56,12 +62,17 @@ class customDialog extends StatelessWidget {
 
 class CardDialog extends StatelessWidget {
   const CardDialog(
-      {Key? key, required this.header, required this.text, required this.type})
+      {Key? key,
+      required this.header,
+      required this.text,
+      required this.type,
+      required this.direction})
       : super(key: key);
 
   final String text;
   final String type;
   final String header;
+  final String direction;
 
   @override
   Widget build(BuildContext context) {
@@ -133,10 +144,14 @@ class CardDialog extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
+                  if (direction != 'none') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
+                    );
+                  } else {
+                    Navigator.of(context).pop();
+                  }
                 },
                 child: const Text('Ok'),
               )
@@ -146,4 +161,6 @@ class CardDialog extends StatelessWidget {
       ),
     );
   }
+
+  void updateStorage() async {}
 }
