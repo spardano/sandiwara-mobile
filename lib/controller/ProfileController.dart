@@ -66,9 +66,6 @@ class ProfileController extends GetxController {
         await http.post(url, body: jsonEncode(body), headers: headers);
 
     final json = await jsonDecode(response.body);
-
-    print(json);
-
     try {
       if (response.statusCode == 200) {
         if (json["status"]) {

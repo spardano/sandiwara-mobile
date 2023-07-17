@@ -23,23 +23,15 @@ class profilePage extends StatefulWidget {
 }
 
 class _profilePageState extends State<profilePage> {
-  ProfileController profileController = Get.put(ProfileController());
-
-  userData? userDataStorage;
+  userData userDataStorage;
 
   _profilePageState(this.userDataStorage);
 
-  bool _switch1 = false;
-  bool _switch2 = false;
   int tapvalue = 0;
 
   @override
   void initState() {
     super.initState();
-    _switch1 = userDataStorage!.push_notif == 1 ? true : false;
-    _switch2 = userDataStorage!.email_news_sub == 1 ? true : false;
-
-    print(userDataStorage!.push_notif);
     setState(() {});
   }
 
@@ -79,9 +71,11 @@ class _profilePageState extends State<profilePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const <Widget>[
+                  children: <Widget>[
                     CardProfile(),
-                    PanelProfile(),
+                    PanelProfile(
+                      userDataStorage: userDataStorage,
+                    ),
                   ],
                 ),
               ),
@@ -173,16 +167,36 @@ class _profilePageState extends State<profilePage> {
 }
 
 class PanelProfile extends StatefulWidget {
-  const PanelProfile({
-    Key? key,
-  }) : super(key: key);
+  final userData userDataStorage;
+
+  const PanelProfile({Key? key, required this.userDataStorage})
+      : super(key: key);
 
   @override
-  State<PanelProfile> createState() => _PanelProfileState();
+  State<PanelProfile> createState() => _PanelProfileState(userDataStorage);
 }
 
 class _PanelProfileState extends State<PanelProfile> {
+  userData? userDataStorage;
   bool switch2 = false;
+  ProfileController profileController = Get.put(ProfileController());
+
+  _PanelProfileState(this.userDataStorage);
+
+  bool _switch1 = false;
+  bool _switch2 = false;
+  int tapvalue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _switch1 = userDataStorage!.push_notif == 1 ? true : false;
+    _switch2 = userDataStorage!.email_news_sub == 1 ? true : false;
+
+    print(userDataStorage!.push_notif);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
