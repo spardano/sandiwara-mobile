@@ -192,8 +192,6 @@ class _PanelProfileState extends State<PanelProfile> {
     super.initState();
     _switch1 = userDataStorage!.push_notif == 1 ? true : false;
     _switch2 = userDataStorage!.email_news_sub == 1 ? true : false;
-
-    print(userDataStorage!.push_notif);
     setState(() {});
   }
 
@@ -232,15 +230,15 @@ class _PanelProfileState extends State<PanelProfile> {
             children: <Widget>[
               Text("Notifikasi", style: textStyleTitle),
               Switch(
-                value: switch2,
+                value: _switch1,
                 onChanged: (bool e) => {
                   setState(() {
                     if (e) {
                       e = true;
-                      switch2 = true;
+                      _switch1 = true;
                     } else {
                       e = false;
-                      switch2 = false;
+                      _switch1 = false;
                     }
                   })
                 },
