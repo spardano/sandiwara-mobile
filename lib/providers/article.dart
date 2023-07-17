@@ -11,36 +11,39 @@ import 'package:sandiwara/models/articleList.dart';
 import 'package:sandiwara/models/commentArticle.dart';
 import 'package:sandiwara/models/detailArticle.dart';
 import 'package:sandiwara/models/newsHeaderModel.dart';
+import 'package:sandiwara/utils/helpers.dart';
 import 'package:sandiwara/widgets/customDialog.dart';
+import 'package:get/get.dart';
 
 class Article with ChangeNotifier {
+  var helper = Helpers();
+  var isLoading = false.obs;
+
   void getDetailArtikel(context, String slug) async {
     try {
-      var response = await http.post(
-          Uri.parse(apiUrl + '/guest/detail-article'),
+      var response = await http.post(Uri.parse('$apiUrl/guest/detail-article'),
           body: {'slug': slug.toString()});
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
-        print('status article :' + data['status'].toString());
-
         final detailArticle detail_article =
             detailArticle.fromJson(data['data']);
 
         if (data['status']) {
           Navigator.of(context).push(
             PageRouteBuilder(
-                pageBuilder: (_, __, ___) => headerSliderDetail(
-                      detail_article: detail_article,
-                    ),
-                transitionDuration: Duration(milliseconds: 600),
-                transitionsBuilder:
-                    (_, Animation<double> animation, __, Widget child) {
-                  return Opacity(
-                    opacity: animation.value,
-                    child: child,
-                  );
-                }),
+              pageBuilder: (_, __, ___) => headerSliderDetail(
+                detail_article: detail_article,
+              ),
+              transitionDuration: Duration(milliseconds: 600),
+              transitionsBuilder:
+                  (_, Animation<double> animation, __, Widget child) {
+                return Opacity(
+                  opacity: animation.value,
+                  child: child,
+                );
+              },
+            ),
           );
         }
       } else {
@@ -60,7 +63,7 @@ class Article with ChangeNotifier {
   void saveComment(
       int id_user, String? id_article, String text, String token) async {
     try {
-      var response = await http.post(Uri.parse(apiUrl + '/auth/store-comment'),
+      var response = await http.post(Uri.parse('$apiUrl/auth/store-comment'),
           headers: {'Authorization': token},
           body: {'message': text, 'id_article': id_article});
     } catch (e) {
@@ -72,12 +75,12 @@ class Article with ChangeNotifier {
     List<commentArticle> commentList = [];
     try {
       var response = await http.post(
-          Uri.parse(apiUrl + '/guest/comments-article'),
+          Uri.parse('$apiUrl/guest/comments-article'),
           body: {'id_article': id_article.toString()});
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
-        print('status comments :' + data['status'].toString());
+        print('status comments :${data['status']}');
 
         for (Map<String, dynamic> item in data['data']) {
           commentList.add(commentArticle.fromJson(item));

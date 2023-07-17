@@ -1,87 +1,81 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:sandiwara/bottomNavbar.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/inside/profilePage.dart';
 import 'package:sandiwara/models/userData.dart';
 import 'package:sandiwara/widgets/customDialog.dart';
+import 'package:sandiwara/utils/helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
-  void signIn(String? email, String? password, context) async {
+  var helper = Helpers();
+  var isLoading = false.obs;
+  Future signIn(context, String email, String password) async {
+    isLoading.value = true;
     try {
-      var response = await http.post(Uri.parse(apiUrl + '/guest/login'),
-          body: {'email': email.toString(), 'password': password.toString()});
-
-      var data = jsonDecode(response.body.toString());
-
-      if (data['status'] == true) {
-        userData user_data = userData.fromJson(data['user']);
-
+      var body = {'email': email, 'password': password};
+      var response =
+          await http.post(Uri.parse('$apiUrl/guest/login'), body: body);
+      isLoading.value = false;
+      if (response.statusCode == 201) {
+        var data = json.decode(response.body);
         setLoginData(
-            data['access_token'], data['token'], data['id_user'], user_data);
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => bottomNavbar()),
-        );
+            data['access_token'], data['token'], data['id_user'], data['user']);
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => const bottomNavbar(),
+        ));
       } else {
-        showDialog(
-            context: context,
-            builder: (context) => customDialog(
-                  header: 'Gagal',
-                  text: data['message'],
-                  type: 'warning',
-                ));
+        helper.showScafoldMessage(
+            context, json.decode(response.body)['message']);
+        debugPrint(json.decode(response.body).toString());
       }
     } catch (e) {
-      print(e.toString());
+      isLoading.value = false;
+      helper.showScafoldMessage(context, e.toString());
     }
   }
 
-  void signUp(String? nama, String? email, String? password, context) async {
-    Uri url = Uri.parse(apiUrl + '/guest/register');
-
+  Future signUp(String? nama, String? email, String? password, context) async {
+    isLoading.value = true;
     try {
-      var response =
-          await http.post(Uri.parse(apiUrl + '/guest/register'), body: {
+      var body = {
         'nama': nama.toString(),
         'email': email.toString(),
         'password': password.toString()
-      });
+      };
+      var response =
+          await http.post(Uri.parse('$apiUrl/guest/register'), body: body);
+      isLoading.value = false;
+      if (response.statusCode == 201) {
+        var data = jsonDecode(response.body.toString());
+        setLoginData(
+            data['access_token'], data['token'], data['id_user'], data['user']);
 
-      var data = jsonDecode(response.body.toString());
-      userData user_data = userData.fromJson(data['user']);
-
-      print(data['access_token']);
-      setLoginData(
-          data['access_token'], data['token'], data['id_user'], user_data);
-
-      var res = jsonDecode(response.body);
-
-      if (data['status']) {
-        if (res['status'] == false) {
-          throw res['message'];
+        var res = jsonDecode(response.body);
+        if (data['status']) {
+          if (res['status'] == false) {
+            throw res['message'];
+          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const bottomNavbar()),
+          );
+        } else {
+          helper.showScafoldMessage(
+              context, json.decode(response.body)['message']);
         }
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => bottomNavbar()),
-        );
       } else {
-        showDialog(
-            context: context,
-            builder: (context) => customDialog(
-                  header: 'Gagal',
-                  text: res['message'],
-                  type: 'warning',
-                ));
+        helper.showScafoldMessage(
+            context, json.decode(response.body)['message']);
+        // debugPrint(json.decode(response.body).toString());
       }
     } catch (e) {
-      print(e.toString());
+      isLoading.value = false;
+      helper.showScafoldMessage(context, e.toString());
     }
   }
 
@@ -92,6 +86,7 @@ class Auth with ChangeNotifier {
     if (bridge.containsKey('access_token')) {
       bridge.remove('access_token');
     }
+    ;
 
     if (bridge.containsKey('user')) {
       bridge.remove('user');
@@ -102,16 +97,18 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> clearDataLogin(context) async {
+    isLoading.value = false;
     final bridge = await SharedPreferences.getInstance();
 
     if (bridge.containsKey('data_login')) {
       bridge.clear();
-
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => bottomNavbar()),
       );
     }
+
+    isLoading.value = false;
   }
 
   void getUser(context) async {

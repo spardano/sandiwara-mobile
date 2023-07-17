@@ -21,4 +21,13 @@ class Helpers {
           return alert;
         });
   }
+
+  showScafoldMessage(context, String message) async {
+    var snackBar = SnackBar(content: Text(message.toString()));
+    return ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  showLoading(status) {
+    return const CircularProgressIndicator();
+  }
 }
