@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:sandiwara/inside/profilePage.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/providers/auth.dart';
