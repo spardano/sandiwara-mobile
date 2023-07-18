@@ -259,8 +259,36 @@ class _PanelProfileState extends State<PanelProfile> {
               },
               text: "Ganti Password"),
           Line(),
-          UpdateNotification(),
-          UpdateNotification(),
+          UpdateNotification(
+              action: (e) {
+                if (e) {
+                  e = true;
+                  _switch1 = true;
+                } else {
+                  e = false;
+                  _switch1 = false;
+                }
+                setState(() {});
+              },
+              title: "Notification",
+              desc:
+                  "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan mengenai berita terkini dengan mangaktifkan notifikasi",
+              status: _switch1),
+          UpdateNotification(
+              action: (e) {
+                if (e) {
+                  e = true;
+                  _switch2 = true;
+                } else {
+                  e = false;
+                  _switch2 = false;
+                }
+                setState(() {});
+              },
+              title: "Langganan Email",
+              desc:
+                  "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan ke email secara berkala ke email kamu",
+              status: _switch2),
           SizedBox(
             height: 15.0,
           ),
@@ -274,17 +302,18 @@ class _PanelProfileState extends State<PanelProfile> {
   }
 }
 
-class UpdateNotification extends StatefulWidget {
+class UpdateNotification extends StatelessWidget {
   const UpdateNotification({
     Key? key,
+    required this.title,
+    required this.desc,
+    required this.action,
+    required this.status,
   }) : super(key: key);
-
-  @override
-  State<UpdateNotification> createState() => _UpdateNotificationState();
-}
-
-class _UpdateNotificationState extends State<UpdateNotification> {
-  bool _switch = false;
+  final String title;
+  final String desc;
+  final Function(bool) action;
+  final bool status;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -292,27 +321,16 @@ class _UpdateNotificationState extends State<UpdateNotification> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text("Notifikasi", style: textStyleTitle),
+            Text(title, style: textStyleTitle),
             Switch(
-              value: _switch,
-              onChanged: (e) {
-                if (e) {
-                  e = true;
-                  _switch = true;
-                } else {
-                  e = false;
-                  _switch = false;
-                }
-                setState(() {});
-              },
+              value: status,
+              onChanged: action,
               activeColor: Colors.lightBlueAccent,
               inactiveTrackColor: Colors.black12,
             ),
           ],
         ),
-        Text(
-            "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan mengenai berita terkini dengan mengaktifkan notifikasi",
-            style: textStyleDeskripsi),
+        Text(desc, style: textStyleDeskripsi),
       ],
     );
   }
