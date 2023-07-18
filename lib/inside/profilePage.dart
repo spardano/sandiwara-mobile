@@ -147,11 +147,6 @@ class _profilePageState extends State<profilePage> {
                         height: 25.0,
                       ),
                       Line(),
-                      TextButtonCustom(onPress: () {}, text: "Kontak"),
-                      Line(),
-                      TextButtonCustom(
-                          onPress: () {}, text: "Syarat dan Ketentuan"),
-                      Line(),
                       TextButtonCustom(
                         text: "Hapus Akun",
                         onPress: hapusAkun,
@@ -256,8 +251,8 @@ class _PanelProfileState extends State<PanelProfile> {
               },
               text: "Ganti Password"),
           Line(),
-          UpdateNotification(),
-          UpdateNotification(),
+          // UpdateNotification(),
+          // UpdateNotification(),
           SizedBox(
             height: 15.0,
           ),
@@ -272,9 +267,16 @@ class _PanelProfileState extends State<PanelProfile> {
 }
 
 class UpdateNotification extends StatefulWidget {
-  const UpdateNotification({
-    Key? key,
-  }) : super(key: key);
+  const UpdateNotification(
+      {Key? key,
+      required this.titleText,
+      required this.desc,
+      required this.functionEvent})
+      : super(key: key);
+
+  final String titleText;
+  final String desc;
+  final Function functionEvent;
 
   @override
   State<UpdateNotification> createState() => _UpdateNotificationState();
@@ -289,7 +291,7 @@ class _UpdateNotificationState extends State<UpdateNotification> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text("Notifikasi", style: textStyleTitle),
+            Text(widget.titleText, style: textStyleTitle),
             Switch(
               value: _switch,
               onChanged: (e) {
@@ -307,9 +309,7 @@ class _UpdateNotificationState extends State<UpdateNotification> {
             ),
           ],
         ),
-        Text(
-            "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan mengenai berita terkini dengan mengaktifkan notifikasi",
-            style: textStyleDeskripsi),
+        Text(widget.desc, style: textStyleDeskripsi),
       ],
     );
   }
