@@ -21,6 +21,7 @@ class Auth with ChangeNotifier {
     isLoading.value = true;
     try {
       var body = {'email': email, 'password': password};
+
       var response =
           await http.post(Uri.parse('$apiUrl/guest/login'), body: body);
       isLoading.value = false;
@@ -43,9 +44,32 @@ class Auth with ChangeNotifier {
     }
   }
 
+  Future deleteAccount(context) async {
+    isLoading.value = true;
+    final bridge = await SharedPreferences.getInstance();
+    try {
+      var header = {'Authorization': bridge.get('access_token').toString()};
+
+      var response = await http.post(Uri.parse('$apiUrl/auth/delete-account'),
+          headers: header);
+
+      isLoading.value = false;
+      if (response.statusCode == 200) {
+        helper.showAlertDialog(context, json.decode(response.body)['message']);
+        clearDataLogin(context);
+      } else {
+        helper.showAlertDialog(context, json.decode(response.body)['message']);
+      }
+    } catch (e) {
+      isLoading.value = false;
+      helper.showAlertDialog(context, e.toString());
+    }
+  }
+
   Future changePassword(String? passwordLama, String? passwordBaru,
       String? passwordKonfirmasi, context) async {
     isLoading.value = true;
+    final bridge = await SharedPreferences.getInstance();
     try {
       var body = {
         'password_lama': passwordLama,
@@ -53,8 +77,10 @@ class Auth with ChangeNotifier {
         'password_konfirmasi': passwordKonfirmasi
       };
 
-      var response = await http.post(Uri.parse('$apiUrl/guest/change-password'),
-          body: body);
+      var headers = {'Authorization': bridge.get('access_token').toString()};
+
+      var response = await http.post(Uri.parse('$apiUrl/auth/change-password'),
+          headers: headers, body: body);
 
       isLoading.value = false;
       if (response.statusCode == 201) {
@@ -84,9 +110,10 @@ class Auth with ChangeNotifier {
           await http.post(Uri.parse('$apiUrl/guest/register'), body: body);
       isLoading.value = false;
       if (response.statusCode == 201) {
-        var data = jsonDecode(response.body.toString());
+        var data = jsonDecode(response.body);
+        userData dataUser = userData.fromJson(data['user']);
         setLoginData(
-            data['access_token'], data['token'], data['id_user'], data['user']);
+            data['access_token'], data['token'], data['id_user'], dataUser);
 
         var res = jsonDecode(response.body);
         if (data['status']) {
