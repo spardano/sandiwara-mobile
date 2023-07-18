@@ -31,7 +31,6 @@ class _ChangePasswordState extends State<ChangePassword> {
   final AutovalidateMode _autovalidate = AutovalidateMode.onUserInteraction;
   final Auth _autenthicationController = Get.put(Auth());
   getUser() async {
-    print("get user");
     bridge = await SharedPreferences.getInstance();
     user = json.decode(bridge.getString('user')!) as Map<String, dynamic>;
     dataUser = userData.fromJson(user);
@@ -40,7 +39,6 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   @override
   void initState() {
-    // TODO: implement initState
     getUser();
     super.initState();
   }
@@ -202,12 +200,12 @@ class _ChangePasswordState extends State<ChangePassword> {
                                 } else if (passwordLamaController.text.length <
                                         8 ||
                                     passwordBaruController.text.length < 8) {
-                                  Helpers().showScafoldMessage(
-                                      context, "Password tidak boleh kosong");
+                                  Helpers().showScafoldMessage(context,
+                                      "Password tidak boleh kurang dari 8 digit");
                                 } else if (passwordBaruController.text.trim() !=
                                     passwordBaruKonfirmController.text.trim()) {
-                                  Helpers().showScafoldMessage(
-                                      context, "Password tidak boleh kosong");
+                                  Helpers().showScafoldMessage(context,
+                                      "Password baru dan konfirmasi password tidak sama");
                                 } else {
                                   _autenthicationController.changePassword(
                                       passwordLamaController.text.trim(),
