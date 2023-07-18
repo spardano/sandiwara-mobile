@@ -28,6 +28,43 @@ class _profilePageState extends State<profilePage> {
     super.initState();
   }
 
+  hapusAkun() {
+    AlertDialog alert = AlertDialog(
+      title: Text("Konfirmasi"),
+      content: Text("Apakah kamu yakin ingin menghapus akun ?"),
+      icon: Icon(
+        Icons.alarm,
+        color: Colors.black,
+      ),
+      iconPadding: EdgeInsets.only(top: 10, bottom: 10),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Provider.of<Auth>(context, listen: false).deleteAccount(context);
+          },
+          child: Text(
+            "Ya",
+            style: TextStyle(color: Colors.grey),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(
+            "Batal",
+            style: TextStyle(color: Colors.black),
+          ),
+        )
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => alert,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,45 +147,24 @@ class _profilePageState extends State<profilePage> {
                         height: 25.0,
                       ),
                       Line(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      Text("Kontak", style: textStyleTitle),
-                      SizedBox(
-                        height: 20.0,
+                      TextButtonCustom(onPress: () {}, text: "Kontak"),
+                      Line(),
+                      TextButtonCustom(
+                          onPress: () {}, text: "Syarat dan Ketentuan"),
+                      Line(),
+                      TextButtonCustom(
+                        text: "Hapus Akun",
+                        onPress: hapusAkun,
                       ),
                       Line(),
+                      TextButtonCustom(
+                          onPress: () {
+                            Provider.of<Auth>(context, listen: false)
+                                .clearDataLogin(context);
+                          },
+                          text: "Keluar"),
                       SizedBox(
-                        height: 20.0,
-                      ),
-                      Text("Syarat dan Ketentuan", style: textStyleTitle),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      Line(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      Text("Hapus Akun", style: textStyleTitle),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      Line(),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      RichText(
-                        text: TextSpan(
-                            text: "Keluar",
-                            style: textStyleTitle,
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                Provider.of<Auth>(context, listen: false)
-                                    .clearDataLogin(context);
-                              }),
-                      ),
-                      SizedBox(
-                        height: 20.0,
+                        height: 10.0,
                       ),
                     ],
                   ),
@@ -157,6 +173,28 @@ class _profilePageState extends State<profilePage> {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class TextButtonCustom extends StatelessWidget {
+  const TextButtonCustom({
+    Key? key,
+    required this.onPress,
+    required this.text,
+  }) : super(key: key);
+  final VoidCallback onPress;
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: TextButton.styleFrom(
+          padding: EdgeInsets.all(0), alignment: Alignment.centerLeft),
+      onPressed: onPress,
+      child: Text(
+        text,
+        style: textStyleTitle,
       ),
     );
   }
@@ -210,18 +248,13 @@ class _PanelProfileState extends State<PanelProfile> {
             height: 15.0,
           ),
           Line(),
-          TextButton(
-            style: TextButton.styleFrom(padding: EdgeInsets.all(0)),
-            child: Text(
-              "Ganti Password",
-              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-            ),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const ChangePassword(),
-              ));
-            },
-          ),
+          TextButtonCustom(
+              onPress: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const ChangePassword(),
+                ));
+              },
+              text: "Ganti Password"),
           Line(),
           UpdateNotification(),
           UpdateNotification(),
@@ -332,8 +365,7 @@ class CardProfile extends StatelessWidget {
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     image: DecorationImage(
-                        image: NetworkImage(
-                            "https://images.pexels.com/photos/3541390/pexels-photo-3541390.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"),
+                        image: AssetImage("assets/images/avatar.png"),
                         fit: BoxFit.cover),
                     borderRadius: BorderRadius.all(Radius.circular(50.0)),
                   ),
