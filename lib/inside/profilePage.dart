@@ -1,14 +1,9 @@
 // ignore_for_file: prefer_const_constructors, no_logic_in_create_state
 
-import 'dart:convert';
-import 'dart:ffi';
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/controller/ProfileController.dart';
-import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/pages/change_password.dart';
@@ -150,11 +145,6 @@ class _profilePageState extends State<profilePage> {
                         height: 25.0,
                       ),
                       Line(),
-                      TextButtonCustom(onPress: () {}, text: "Kontak"),
-                      Line(),
-                      TextButtonCustom(
-                          onPress: () {}, text: "Syarat dan Ketentuan"),
-                      Line(),
                       TextButtonCustom(
                         text: "Hapus Akun",
                         onPress: hapusAkun,
@@ -268,6 +258,8 @@ class _PanelProfileState extends State<PanelProfile> {
                   e = false;
                   _switch1 = false;
                 }
+                profileController.updateNotificationStatus(
+                    _switch1, 'push-notif');
                 setState(() {});
               },
               title: "Notification",
@@ -283,6 +275,8 @@ class _PanelProfileState extends State<PanelProfile> {
                   e = false;
                   _switch2 = false;
                 }
+                profileController.updateNotificationStatus(
+                    _switch2, 'email-sub');
                 setState(() {});
               },
               title: "Langganan Email",

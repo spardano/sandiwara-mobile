@@ -9,7 +9,8 @@ import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileController extends GetxController {
-  Future<void> updateNotificationStatus(bool statusNotification) async {
+  Future<void> updateNotificationStatus(
+      bool statusSwitch, String status_type) async {
     final bridge = await SharedPreferences.getInstance();
     String token = '';
     if (bridge.containsKey('access_token')) {
@@ -17,8 +18,18 @@ class ProfileController extends GetxController {
     }
 
     var headers = {'Content-Type': 'application/json', 'Authorization': token};
-    var url = Uri.parse('$apiUrl/auth/update-notification');
-    Map body = {'status_notifikasi': statusNotification};
+
+    Uri url = Uri();
+    Map body = {};
+    if (status_type == 'push-notif') {
+      url = Uri.parse('$apiUrl/auth/update-notification');
+      body = {'status_notifikasi': statusSwitch};
+    }
+
+    if (status_type == 'email-sub') {
+      url = Uri.parse('$apiUrl/auth/update-email-sub');
+      body = {'status_email_sub': statusSwitch};
+    }
 
     try {
       http.Response response =
@@ -28,49 +39,15 @@ class ProfileController extends GetxController {
 
       if (response.statusCode == 200) {
         if (json["status"]) {
-          //update preference
-          updateStatusNotificationStorage(statusNotification);
-        } else {
-          throw jsonDecode(response.body)['message'] ?? 'Error tidak diketahui';
-        }
-      } else {
-        throw jsonDecode(response.body)['message'] ?? 'Error tidak diketahui';
-      }
-    } catch (e) {
-      print(e.toString());
-      Get.back();
-      showDialog(
-          context: Get.context!,
-          builder: (context) => customDialog(
-                header: 'Gagal',
-                text: e.toString(),
-                type: 'warning',
-                direction: null,
-              ));
-    }
-  }
+          if (status_type == 'push-notif') {
+            //update preference
+            updateStatusNotificationStorage(statusSwitch);
+          }
 
-  Future<void> updateEmailSubsStatus(bool statusEmailSub) async {
-    final bridge = await SharedPreferences.getInstance();
-    String token = '';
-    if (bridge.containsKey('access_token')) {
-      var dataToken = bridge.getString('access_token')!;
-      token = dataToken.toString();
-    }
-
-    var headers = {'Content-Type': 'application/json', 'Authorization': token};
-    var url = Uri.parse('$apiUrl/auth/update-email-sub');
-    Map body = {'status_email_sub': statusEmailSub};
-
-    http.Response response =
-        await http.post(url, body: jsonEncode(body), headers: headers);
-
-    final json = await jsonDecode(response.body);
-    try {
-      if (response.statusCode == 200) {
-        if (json["status"]) {
-          //update preference
-          updateEmailSubsStatus(statusEmailSub);
+          if (status_type == 'email-sub') {
+            //update preference
+            updateStatusEmailSubStorage(statusSwitch);
+          }
         } else {
           throw jsonDecode(response.body)['message'] ?? 'Error tidak diketahui';
         }
@@ -130,9 +107,11 @@ class ProfileController extends GetxController {
           jsonDecode(bridge.getString('user')!) as Map<String, dynamic>;
       userData user = userData.fromJson(user_map);
 
-      if (user.email_news_sub != null) {
+      print(user.push_notif);
+
+      if (user.email_news_subs != null) {
         var numberStatus = statusEmailSub == true ? 1 : 0;
-        user.email_news_sub = numberStatus;
+        user.email_news_subs = numberStatus;
 
         final updateMyData = userData.encode(user);
 

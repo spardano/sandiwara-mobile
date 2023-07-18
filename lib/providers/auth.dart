@@ -27,9 +27,9 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = json.decode(response.body);
-        userData dataUser = userData.fromJson(data['user']);
-        setLoginData(
-            data['access_token'], data['token'], data['id_user'], dataUser);
+        userData user = userData.fromJson(data['user']);
+
+        setLoginData(data['access_token'], data['token'], user);
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => const bottomNavbar(),
         ));
@@ -110,10 +110,9 @@ class Auth with ChangeNotifier {
           await http.post(Uri.parse('$apiUrl/guest/register'), body: body);
       isLoading.value = false;
       if (response.statusCode == 201) {
-        var data = jsonDecode(response.body);
-        userData dataUser = userData.fromJson(data['user']);
-        setLoginData(
-            data['access_token'], data['token'], data['id_user'], dataUser);
+        var data = jsonDecode(response.body.toString());
+        userData user = userData.fromJson(data['user']);
+        setLoginData(data['access_token'], data['token'], data['user']);
 
         var res = jsonDecode(response.body);
         if (data['status']) {
@@ -140,7 +139,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> setLoginData(
-      String access_token, String token, int id_user, userData user) async {
+      String access_token, String token, userData user) async {
     final bridge = await SharedPreferences.getInstance();
     if (bridge.containsKey('access_token')) {
       bridge.remove('access_token');
