@@ -1,11 +1,9 @@
 // ignore_for_file: prefer_const_constructors, no_logic_in_create_state
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/controller/ProfileController.dart';
-import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/pages/change_password.dart';
@@ -251,8 +249,40 @@ class _PanelProfileState extends State<PanelProfile> {
               },
               text: "Ganti Password"),
           Line(),
-          // UpdateNotification(),
-          // UpdateNotification(),
+          UpdateNotification(
+              action: (e) {
+                if (e) {
+                  e = true;
+                  _switch1 = true;
+                } else {
+                  e = false;
+                  _switch1 = false;
+                }
+                profileController.updateNotificationStatus(
+                    _switch1, 'push-notif');
+                setState(() {});
+              },
+              title: "Notification",
+              desc:
+                  "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan mengenai berita terkini dengan mangaktifkan notifikasi",
+              status: _switch1),
+          UpdateNotification(
+              action: (e) {
+                if (e) {
+                  e = true;
+                  _switch2 = true;
+                } else {
+                  e = false;
+                  _switch2 = false;
+                }
+                profileController.updateNotificationStatus(
+                    _switch2, 'email-sub');
+                setState(() {});
+              },
+              title: "Langganan Email",
+              desc:
+                  "Kamu bisa mengontrol apakah kamu bersedia menerima pemberitahuan ke email secara berkala ke email kamu",
+              status: _switch2),
           SizedBox(
             height: 15.0,
           ),
@@ -266,24 +296,18 @@ class _PanelProfileState extends State<PanelProfile> {
   }
 }
 
-class UpdateNotification extends StatefulWidget {
-  const UpdateNotification(
-      {Key? key,
-      required this.titleText,
-      required this.desc,
-      required this.functionEvent})
-      : super(key: key);
-
-  final String titleText;
+class UpdateNotification extends StatelessWidget {
+  const UpdateNotification({
+    Key? key,
+    required this.title,
+    required this.desc,
+    required this.action,
+    required this.status,
+  }) : super(key: key);
+  final String title;
   final String desc;
-  final Function functionEvent;
-
-  @override
-  State<UpdateNotification> createState() => _UpdateNotificationState();
-}
-
-class _UpdateNotificationState extends State<UpdateNotification> {
-  bool _switch = false;
+  final Function(bool) action;
+  final bool status;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -291,25 +315,16 @@ class _UpdateNotificationState extends State<UpdateNotification> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text(widget.titleText, style: textStyleTitle),
+            Text(title, style: textStyleTitle),
             Switch(
-              value: _switch,
-              onChanged: (e) {
-                if (e) {
-                  e = true;
-                  _switch = true;
-                } else {
-                  e = false;
-                  _switch = false;
-                }
-                setState(() {});
-              },
+              value: status,
+              onChanged: action,
               activeColor: Colors.lightBlueAccent,
               inactiveTrackColor: Colors.black12,
             ),
           ],
         ),
-        Text(widget.desc, style: textStyleDeskripsi),
+        Text(desc, style: textStyleDeskripsi),
       ],
     );
   }
