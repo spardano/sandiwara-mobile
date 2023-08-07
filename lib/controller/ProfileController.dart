@@ -9,6 +9,7 @@ import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileController extends GetxController {
+  
   Future<void> updateNotificationStatus(
       bool statusSwitch, String status_type) async {
     final bridge = await SharedPreferences.getInstance();
