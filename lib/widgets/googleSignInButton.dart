@@ -23,15 +23,15 @@ class _googleSignInButtonState extends State<googleSignInButton> {
       child: AppOutlineButton(
         asset: "assets/images/google.png",
         onTap: () async {
-          User? user = await Authentication.signInWithGoogle(context: context);
+          // User? user = await Authentication.signInWithGoogle(context: context);
 
-          if (user != null) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => bottomNavbar(),
-              ),
-            );
-          }
+          // if (user != null) {
+          //   Navigator.of(context).pushReplacement(
+          //     MaterialPageRoute(
+          //       builder: (context) => bottomNavbar(),
+          //     ),
+          //   );
+          // }
         },
       ),
     );
