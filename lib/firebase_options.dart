@@ -17,16 +17,19 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return android;
-      case TargetPlatform.iOS:
         throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
+          'DefaultFirebaseOptions have not been configured for android - '
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
+      case TargetPlatform.iOS:
+        return ios;
       case TargetPlatform.macOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for macos - '
@@ -49,21 +52,14 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyC6QEWW5kTmxs6w6r0oXwWNdbHKwpdlgJ0',
-    appId: '1:502775703033:web:058a1440542d5068db8928',
-    messagingSenderId: '502775703033',
-    projectId: 'sandiwara-4e1cd',
-    authDomain: 'sandiwara-4e1cd.firebaseapp.com',
-    storageBucket: 'sandiwara-4e1cd.appspot.com',
-    measurementId: 'G-BC07PWZT1J',
-  );
-
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB_wb-unila_qKuVNYMQWjFV455DBFKLqQ',
-    appId: '1:502775703033:android:ae4480205487f4cbdb8928',
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDZA8PFG7byluOy5x60IN1Qzdqlty5zaG8',
+    appId: '1:502775703033:ios:af0acfed658b5677db8928',
     messagingSenderId: '502775703033',
     projectId: 'sandiwara-4e1cd',
     storageBucket: 'sandiwara-4e1cd.appspot.com',
+    androidClientId: '502775703033-4sr57533fchkh99j2enocde8v9mbnf5c.apps.googleusercontent.com',
+    iosClientId: '502775703033-chm7bva1vivu6ocl42vq980ut402uslf.apps.googleusercontent.com',
+    iosBundleId: 'ai.squad.sandiwara',
   );
 }

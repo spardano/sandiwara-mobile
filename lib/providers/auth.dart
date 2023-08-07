@@ -112,7 +112,7 @@ class Auth with ChangeNotifier {
       if (response.statusCode == 201) {
         var data = jsonDecode(response.body.toString());
         userData user = userData.fromJson(data['user']);
-        setLoginData(data['access_token'], data['token'], data['user']);
+        setLoginData(data['access_token'], data['token'], user);
 
         var res = jsonDecode(response.body);
         if (data['status']) {
@@ -130,7 +130,6 @@ class Auth with ChangeNotifier {
       } else {
         helper.showScafoldMessage(
             context, json.decode(response.body)['message']);
-        // debugPrint(json.decode(response.body).toString());
       }
     } catch (e) {
       isLoading.value = false;

@@ -48,14 +48,11 @@ class _topBarState extends State<topBar> {
                     backgroundColor: Colors.white,
                     title: Row(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Flexible(
-                            flex: 3,
-                            child: Image.asset(
-                              "assets/images/logo_sandiwara.png",
-                              width: 140,
-                            ),
+                        Flexible(
+                          flex: 3,
+                          child: Image.asset(
+                            "assets/images/logo_sandiwara.png",
+                            width: 140,
                           ),
                         ),
                       ],

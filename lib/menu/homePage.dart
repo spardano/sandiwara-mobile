@@ -35,55 +35,47 @@ class _homePageState extends State<homePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: Stack(
-                children: [
-                  WebView(
-                    gestureNavigationEnabled: true,
-                    initialUrl: '$mainUrl/webview/home',
-                    javascriptMode: JavascriptMode.unrestricted,
-                    javascriptChannels: <JavascriptChannel>{
-                      _jsDataCallback(context)
-                    },
-                    gestureRecognizers: {
-                      Factory<VerticalDragGestureRecognizer>(
-                          () => VerticalDragGestureRecognizer()
-                            ..onDown = (DragDownDetails dragDownDetails) {
-                              controller.getScrollY().then((value) {
-                                if (value == 0 &&
-                                    dragDownDetails.globalPosition.direction <
-                                        1) {
-                                  controller.reload();
-                                }
-                              });
-                            })
-                    },
-                    onPageStarted: (String url) {
-                      setState(() {});
-                    },
-                    onProgress: (progress) {
-                      setState(() {
-                        this.progress = progress / 100;
+      body: Stack(
+        children: [
+          WebView(
+            gestureNavigationEnabled: true,
+            initialUrl: '$mainUrl/webview/home',
+            javascriptMode: JavascriptMode.unrestricted,
+            javascriptChannels: <JavascriptChannel>{
+              _jsDataCallback(context)
+            },
+            gestureRecognizers: {
+              Factory<VerticalDragGestureRecognizer>(
+                  () => VerticalDragGestureRecognizer()
+                    ..onDown = (DragDownDetails dragDownDetails) {
+                      controller.getScrollY().then((value) {
+                        if (value == 0 &&
+                            dragDownDetails.globalPosition.direction <
+                                1) {
+                          controller.reload();
+                        }
                       });
-                    },
-                    onPageFinished: (String url) {
-                      setState(() {});
-                    },
-                    onWebViewCreated: (controller) {
-                      this.controller = controller;
-                    },
-                  ),
-                  progress < 1.0
-                      ? LinearProgressIndicator(value: progress)
-                      : Container(),
-                ],
-              ),
-            ),
-          ],
-        ),
+                    })
+            },
+            onPageStarted: (String url) {
+              setState(() {});
+            },
+            onProgress: (progress) {
+              setState(() {
+                this.progress = progress / 100;
+              });
+            },
+            onPageFinished: (String url) {
+              setState(() {});
+            },
+            onWebViewCreated: (controller) {
+              this.controller = controller;
+            },
+          ),
+          progress < 1.0
+              ? LinearProgressIndicator(value: progress)
+              : Container(),
+        ],
       ),
     );
   }

@@ -68,6 +68,10 @@ class _profilePageState extends State<profilePage> {
     return Scaffold(
       backgroundColor: Color(0xFFF9F9F9),
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
+        ), 
         backgroundColor: Colors.white,
         centerTitle: true,
         title: const Text(
