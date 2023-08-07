@@ -1,15 +1,9 @@
-import 'dart:convert';
-import 'dart:ffi';
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/controller/ProfileController.dart';
 import 'package:sandiwara/inside/profilePage.dart';
 import 'package:sandiwara/models/user_data.dart';
-import 'package:sandiwara/providers/auth.dart';
 
 class profilePage2 extends StatefulWidget {
   const profilePage2({Key? key, required this.userDataStorage})
@@ -31,7 +25,7 @@ class _profilePage2State extends State<profilePage2> {
     // TODO: implement initState
     super.initState();
     _switch1 = widget.userDataStorage.push_notif == 1 ? true : false;
-    _switch2 = widget.userDataStorage!.email_news_sub == 1 ? true : false;
+    _switch2 = widget.userDataStorage!.email_news_subs == 1 ? true : false;
   }
 
   @override

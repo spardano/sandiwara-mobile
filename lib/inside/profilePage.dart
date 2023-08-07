@@ -218,7 +218,7 @@ class _PanelProfileState extends State<PanelProfile> {
   void initState() {
     super.initState();
     _switch1 = userDataStorage!.push_notif == 1 ? true : false;
-    _switch2 = userDataStorage!.email_news_sub == 1 ? true : false;
+    _switch2 = userDataStorage!.email_news_subs == 1 ? true : false;
     setState(() {});
   }
 

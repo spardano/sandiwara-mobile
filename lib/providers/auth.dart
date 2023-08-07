@@ -27,6 +27,7 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = json.decode(response.body);
+
         userData user = userData.fromJson(data['user']);
 
         setLoginData(data['access_token'], data['token'], user);
@@ -111,6 +112,7 @@ class Auth with ChangeNotifier {
       isLoading.value = false;
       if (response.statusCode == 201) {
         var data = jsonDecode(response.body.toString());
+
         userData user = userData.fromJson(data['user']);
         setLoginData(data['access_token'], data['token'], data['user']);
 

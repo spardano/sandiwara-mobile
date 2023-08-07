@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:sandiwara/models/userData.dart';
+import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,7 +28,7 @@ class ProfileController extends GetxController {
 
     if (status_type == 'email-sub') {
       url = Uri.parse('$apiUrl/auth/update-email-sub');
-      body = {'status_email_sub': statusSwitch};
+      body = {'status_email_subs': statusSwitch};
     }
 
     try {
@@ -106,8 +106,6 @@ class ProfileController extends GetxController {
       var user_map =
           jsonDecode(bridge.getString('user')!) as Map<String, dynamic>;
       userData user = userData.fromJson(user_map);
-
-      print(user.push_notif);
 
       if (user.email_news_subs != null) {
         var numberStatus = statusEmailSub == true ? 1 : 0;
