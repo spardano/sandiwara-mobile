@@ -1,4 +1,4 @@
-package ai.squad.kominfo.sandiwara
+package ai.squad.sandiwara
 
 import io.flutter.embedding.android.FlutterActivity
 

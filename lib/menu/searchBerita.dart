@@ -1,17 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:provider/provider.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/models/articleList.dart';
-import 'package:sandiwara/providers/article.dart';
 import 'package:sandiwara/utils/helpers.dart';
 import 'package:sandiwara/widgets/card_news.dart';
-import 'package:sandiwara/widgets/imageContainer.dart';
 import 'package:http/http.dart' as http;
 
 class searchBerita extends StatefulWidget {
@@ -74,7 +67,7 @@ class _searchBeritaState extends State<searchBerita> {
         padding: const EdgeInsets.all(20.0),
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.25,
+            height: MediaQuery.of(context).size.height * 0.22,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -129,8 +122,7 @@ class _searchBeritaState extends State<searchBerita> {
           FutureBuilder(
             future: getListArtikel(),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasData) {
+              if (snapshot.hasData) {
                 return SizedBox(
                   height: MediaQuery.of(context).size.height,
                   child: ListView.builder(
@@ -151,11 +143,6 @@ class _searchBeritaState extends State<searchBerita> {
                 );
               } else if (snapshot.hasError) {
                 return const Center(child: Text('Something went wrong'));
-              } else if (!snapshot.hasData &&
-                  snapshot.connectionState == ConnectionState.done) {
-                return const Center(
-                  child: Text("Data tidak ditemukan "),
-                );
               } else {
                 return const Center(
                   child: CircularProgressIndicator(),

@@ -8,6 +8,7 @@ import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/pages/change_password.dart';
 import 'package:sandiwara/providers/auth.dart';
+import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 
 class profilePage extends StatefulWidget {
   const profilePage({Key? key, required this.userDataStorage})
@@ -71,7 +72,7 @@ class _profilePageState extends State<profilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
-        ), 
+        ),
         backgroundColor: Colors.white,
         centerTitle: true,
         title: const Text(
@@ -378,17 +379,29 @@ class CardProfile extends StatelessWidget {
             padding: const EdgeInsets.only(top: 40.0),
             child: Column(
               children: <Widget>[
-                Container(
-                  height: 60.0,
-                  width: 60.0,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    image: DecorationImage(
-                        image: AssetImage("assets/images/avatar.png"),
-                        fit: BoxFit.cover),
-                    borderRadius: BorderRadius.all(Radius.circular(50.0)),
+                Stack(children: <Widget>[
+                  ProfilePicture(
+                    name: nama,
+                    radius: 31,
+                    fontsize: 21,
                   ),
-                ),
+                  Positioned(
+                      bottom: -3,
+                      right: -2,
+                      child: InkWell(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: ((builder) => bottomSheet(context)),
+                          );
+                        },
+                        child: Icon(
+                          Icons.camera_alt,
+                          size: 25,
+                          color: Colors.blue,
+                        ),
+                      ))
+                ]),
                 const SizedBox(
                   height: 12.0,
                 ),
@@ -413,6 +426,55 @@ class CardProfile extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+
+  Widget bottomSheet(context) {
+    return Container(
+      height: 100.0,
+      width: MediaQuery.of(context).size.width,
+      margin: EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 20,
+      ),
+      child: Column(children: <Widget>[
+        Text(
+          "Pilih Foto Profile",
+          style: TextStyle(fontSize: 20.0),
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () {},
+              child: Row(
+                children: const [
+                  Icon(Icons.camera),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text('Kamera'),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () {},
+              child: Row(
+                children: const [
+                  Icon(Icons.image),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text('Galeri'),
+                ],
+              ),
+            )
+          ],
+        )
+      ]),
     );
   }
 }

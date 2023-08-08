@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ai.squad.kominfo.sandiwara">
+    package="ai.squad.sandiwara">
    <application
         android:label="sandiwara"
         android:usesCleartextTraffic="true"

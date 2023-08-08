@@ -64,12 +64,7 @@ class _topBarState extends State<topBar> {
                         child: GestureDetector(
                           onTap: () {
                             if (isAuthenticated == false) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
-                                ),
-                              );
+                              Navigator.pushNamed(context, '/login/');
                             } else {
                               try {
                                 Provider.of<Auth>(context, listen: false)

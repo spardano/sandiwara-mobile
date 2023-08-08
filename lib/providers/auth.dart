@@ -3,14 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 import 'package:sandiwara/bottomNavbar.dart';
 import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/inside/profilePage.dart';
-import 'package:sandiwara/inside/profilePage2.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/pages/loginPage.dart';
-import 'package:sandiwara/widgets/customDialog.dart';
 import 'package:sandiwara/utils/helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,9 +28,7 @@ class Auth with ChangeNotifier {
         userData user = userData.fromJson(data['user']);
 
         setLoginData(data['access_token'], data['token'], user);
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const bottomNavbar(),
-        ));
+        Navigator.pushNamedAndRemoveUntil(context, '/home/', (route) => false);
       } else {
         helper.showScafoldMessage(
             context, json.decode(response.body)['message']);
@@ -160,10 +155,8 @@ class Auth with ChangeNotifier {
     if (bridge.containsKey('access_token')) {
       bridge.clear();
     }
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const bottomNavbar()),
-    );
+
+    Navigator.pushNamedAndRemoveUntil(context, '/home/', (route) => false);
 
     isLoading.value = false;
   }
