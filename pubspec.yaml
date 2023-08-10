@@ -59,6 +59,7 @@ dependencies:
   flutter_profile_picture: ^2.0.0
   image_picker: ^1.0.2
   image_cropper: ^4.0.1
+  dio: ^5.3.2
 
 dev_dependencies:
   flutter_test:

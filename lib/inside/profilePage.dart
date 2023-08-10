@@ -1,7 +1,9 @@
 // ignore_for_file: prefer_const_constructors, no_logic_in_create_state
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sandiwara/controller/ProfileController.dart';
 import 'package:sandiwara/constant.dart';
@@ -9,6 +11,7 @@ import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/pages/change_password.dart';
 import 'package:sandiwara/providers/auth.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
+import 'dart:developer' as devtools show log;
 
 class profilePage extends StatefulWidget {
   const profilePage({Key? key, required this.userDataStorage})
@@ -108,6 +111,10 @@ class _profilePageState extends State<profilePage> {
                     CardProfile(
                       email: widget.userDataStorage.email.toString(),
                       nama: widget.userDataStorage.name.toString(),
+                      profile_picture: mainUrl +
+                              '/storage/' +
+                              widget.userDataStorage.profile_picture ??
+                          'https://sandiwara.id/images/avatar.png',
                     ),
                     PanelProfile(
                       userDataStorage: widget.userDataStorage,
@@ -350,14 +357,24 @@ class Line extends StatelessWidget {
   }
 }
 
-class CardProfile extends StatelessWidget {
-  const CardProfile({
-    Key? key,
-    required this.nama,
-    required this.email,
-  }) : super(key: key);
+class CardProfile extends StatefulWidget {
+  CardProfile(
+      {Key? key,
+      required this.nama,
+      required this.email,
+      required this.profile_picture})
+      : super(key: key);
   final String nama;
   final String email;
+  final String profile_picture;
+
+  @override
+  State<CardProfile> createState() => _CardProfileState();
+}
+
+class _CardProfileState extends State<CardProfile> {
+  ProfileController profileController = Get.put(ProfileController());
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -379,34 +396,72 @@ class CardProfile extends StatelessWidget {
             padding: const EdgeInsets.only(top: 40.0),
             child: Column(
               children: <Widget>[
-                Stack(children: <Widget>[
-                  ProfilePicture(
-                    name: nama,
-                    radius: 31,
-                    fontsize: 21,
-                  ),
-                  Positioned(
-                      bottom: -3,
-                      right: -2,
-                      child: InkWell(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: ((builder) => bottomSheet(context)),
+                SizedBox(
+                  height: 70,
+                  width: 70,
+                  child: Stack(fit: StackFit.expand, children: <Widget>[
+                    Obx(() {
+                      if (profileController.isLoading.value) {
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(widget.profile_picture),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                                backgroundColor: Colors.white),
+                          ),
+                        );
+                      } else {
+                        if (profileController.imageUrl.length != 0) {
+                          return CachedNetworkImage(
+                            imageUrl: profileController.imageUrl,
+                            fit: BoxFit.cover,
+                            imageBuilder: (context, imageProvider) =>
+                                CircleAvatar(
+                              backgroundColor: Colors.white,
+                              backgroundImage: imageProvider,
+                            ),
+                            placeholder: (context, url) => CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(widget.profile_picture),
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  backgroundColor: Colors.white,
+                                ),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
                           );
-                        },
-                        child: Icon(
-                          Icons.camera_alt,
-                          size: 25,
-                          color: Colors.blue,
-                        ),
-                      ))
-                ]),
+                        } else {
+                          return CircleAvatar(
+                            backgroundImage:
+                                NetworkImage(widget.profile_picture),
+                          );
+                        }
+                      }
+                    }),
+                    Positioned(
+                        bottom: -3,
+                        right: -2,
+                        child: InkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              builder: ((builder) => bottomSheet(context)),
+                            );
+                          },
+                          child: Icon(
+                            Icons.camera_alt,
+                            size: 25,
+                            color: Colors.blue,
+                          ),
+                        ))
+                  ]),
+                ),
                 const SizedBox(
                   height: 12.0,
                 ),
                 Text(
-                  nama ?? "Jipau Developer",
+                  widget.nama ?? "Jipau Developer",
                   style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontFamily: "Popins",
@@ -414,7 +469,7 @@ class CardProfile extends StatelessWidget {
                       letterSpacing: 1.5),
                 ),
                 Text(
-                  email ?? "Jipaudev@gmail.com",
+                  widget.email ?? "Jipaudev@gmail.com",
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w200,
@@ -449,7 +504,11 @@ class CardProfile extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.back();
+                profileController.updateImage(ImageSource.camera);
+                devtools.log('call camera');
+              },
               child: Row(
                 children: const [
                   Icon(Icons.camera),
@@ -461,7 +520,10 @@ class CardProfile extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.back();
+                profileController.updateImage(ImageSource.gallery);
+              },
               child: Row(
                 children: const [
                   Icon(Icons.image),

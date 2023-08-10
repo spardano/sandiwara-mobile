@@ -83,6 +83,8 @@ class _ChangePasswordState extends State<ChangePassword> {
                       email: dataUser.email != null
                           ? dataUser.email.toString()
                           : 'email@example.com',
+                      profile_picture: dataUser.profile_picture ??
+                          'https://sandiwara.id/images/avatar.png',
                     ),
                     Container(
                       padding: const EdgeInsets.only(bottom: 20),
