@@ -10,7 +10,6 @@ import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/pages/change_password.dart';
 import 'package:sandiwara/providers/auth.dart';
-import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import 'dart:developer' as devtools show log;
 
 class profilePage extends StatefulWidget {
@@ -111,10 +110,10 @@ class _profilePageState extends State<profilePage> {
                     CardProfile(
                       email: widget.userDataStorage.email.toString(),
                       nama: widget.userDataStorage.name.toString(),
-                      profile_picture: mainUrl +
-                              '/storage/' +
-                              widget.userDataStorage.profile_picture ??
-                          'https://sandiwara.id/images/avatar.png',
+                      profile_picture: widget.userDataStorage.profile_picture !=
+                              null
+                          ? '$mainUrl/storage${widget.userDataStorage.profile_picture}'
+                          : 'https://sandiwara.id/images/avatar.png',
                     ),
                     PanelProfile(
                       userDataStorage: widget.userDataStorage,

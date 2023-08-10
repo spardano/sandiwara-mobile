@@ -1,10 +1,6 @@
 // ignore_for_file: dead_code, camel_case_types
 
-import 'dart:io';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sandiwara/constant.dart';
@@ -12,7 +8,6 @@ import 'package:sandiwara/menu/categoryBerita.dart';
 import 'package:sandiwara/menu/homePage.dart';
 import 'package:sandiwara/menu/searchBerita.dart';
 import 'package:sandiwara/topBar.dart';
-import 'package:sandiwara/widgets/customDialog.dart';
 
 class bottomNavbar extends StatefulWidget {
   const bottomNavbar({super.key, this.notificationAppLaunchDetails});
@@ -77,14 +72,14 @@ class _bottomNavbarState extends State<bottomNavbar> {
       sound: true,
     );
 
-    if(settings.authorizationStatus == AuthorizationStatus.authorized) {
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted Permission');
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional){
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       print('User granted Provisional Permission');
     } else {
       print('User declined or has not accepted permission');
     }
-    
   }
 
   void getToken() async {
@@ -97,7 +92,6 @@ class _bottomNavbarState extends State<bottomNavbar> {
   }
 
   initInfo() {
-
     FirebaseMessaging.instance.subscribeToTopic("SANDIWARA");
 
     FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -106,22 +100,24 @@ class _bottomNavbarState extends State<bottomNavbar> {
       sound: true,
     );
 
-    var androidInitilize = const AndroidInitializationSettings('@mipmap/launcher_icon');
+    var androidInitilize =
+        const AndroidInitializationSettings('@mipmap/launcher_icon');
     var iOSInitialize = const DarwinInitializationSettings();
-    var initializationSettings = InitializationSettings(android: androidInitilize, iOS: iOSInitialize);
-    flutterLocalNotificationPlugin.initialize(initializationSettings,  onDidReceiveNotificationResponse:
-            (NotificationResponse notificationResponse){
-              switch (notificationResponse.notificationResponseType) {
-                case NotificationResponseType.selectedNotification:
-                  selectNotificationStream.add(notificationResponse.payload);
-                  break;
-                case NotificationResponseType.selectedNotification:
-                  if (notificationResponse.actionId == navigationActionId) {
-                    selectNotificationStream.add(notificationResponse.payload);
-                  }
-              }
-      }, onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
-
+    var initializationSettings =
+        InitializationSettings(android: androidInitilize, iOS: iOSInitialize);
+    flutterLocalNotificationPlugin.initialize(initializationSettings,
+        onDidReceiveNotificationResponse:
+            (NotificationResponse notificationResponse) {
+      switch (notificationResponse.notificationResponseType) {
+        case NotificationResponseType.selectedNotification:
+          selectNotificationStream.add(notificationResponse.payload);
+          break;
+        case NotificationResponseType.selectedNotification:
+          if (notificationResponse.actionId == navigationActionId) {
+            selectNotificationStream.add(notificationResponse.payload);
+          }
+      }
+    }, onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
 
     // flutterLocalNotificationPlugin.initialize(initializationSettings,
     //     onDidReceiveNotificationResponse:
@@ -136,7 +132,6 @@ class _bottomNavbarState extends State<bottomNavbar> {
     //       }
     //   }
     // }, onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
-
 
     // FirebaseMessaging.onMessage.listen(
     //   (RemoteMessage message) {
@@ -160,7 +155,6 @@ class _bottomNavbarState extends State<bottomNavbar> {
     //     }
     //   },
     // );
-
 
     // await FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     //   print('A new onMessageOpenedApp event was published !');
@@ -186,7 +180,6 @@ class _bottomNavbarState extends State<bottomNavbar> {
     //     );
     //   }
     // });
-
   }
 
   @override

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/inside/profilePage.dart';
 import 'package:sandiwara/models/user_data.dart';
 import 'package:sandiwara/providers/auth.dart';
@@ -83,8 +84,9 @@ class _ChangePasswordState extends State<ChangePassword> {
                       email: dataUser.email != null
                           ? dataUser.email.toString()
                           : 'email@example.com',
-                      profile_picture: dataUser.profile_picture ??
-                          'https://sandiwara.id/images/avatar.png',
+                      profile_picture: dataUser.profile_picture != null
+                          ? '$mainUrl/storage${dataUser.profile_picture}'
+                          : 'https://sandiwara.id/images/avatar.png',
                     ),
                     Container(
                       padding: const EdgeInsets.only(bottom: 20),

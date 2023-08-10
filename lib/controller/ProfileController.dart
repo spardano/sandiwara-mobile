@@ -146,8 +146,8 @@ class ProfileController extends GetxController {
         var response = await ProfileService.uploadPic(pickedFile.path);
         if (response.statusCode == 200) {
           imageUrl =
-              mainUrl + '/storage/' + response.data['user']['profile_picture'];
-          devtools.log(imageUrl);
+              mainUrl + '/storage' + response.data['user']['profile_picture'];
+          devtools.log(response.data['user']['profile_picture']);
           updateImageStorage(response.data['user']['profile_picture']);
         } else if (response.statusCode == 401) {
           Get.offAllNamed('/register');
