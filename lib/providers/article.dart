@@ -24,6 +24,9 @@ class Article with ChangeNotifier {
       var response = await http.post(Uri.parse('$apiUrl/guest/detail-article'),
           body: {'slug': slug.toString()});
 
+      print(
+          "${response.statusCode} article ${jsonDecode(response.body.toString())}");
+
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
         final detailArticle detail_article =
