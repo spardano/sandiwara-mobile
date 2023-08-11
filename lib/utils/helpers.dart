@@ -1,5 +1,16 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
+import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/main.dart';
+import 'package:sandiwara/providers/article.dart';
+import 'package:sandiwara/widgets/customDialog.dart';
 
 class Helpers {
   showAlertDialog(BuildContext context, String text) {
@@ -29,5 +40,206 @@ class Helpers {
 
   showLoading(status) {
     return const CircularProgressIndicator();
+  }
+}
+
+Future<void> hendleBackgroundMessage(RemoteMessage message) async {
+  print("Title : ${message.notification?.title}");
+  print("Body : ${message.notification?.body}");
+  print("Payload : ${message.data}");
+}
+
+class NotificationArguments {
+  final String title;
+  final String body;
+
+  NotificationArguments(this.title, this.body);
+}
+
+class ReceivedNotification {
+  ReceivedNotification({
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.payload,
+  });
+
+  final int id;
+  final String? title;
+  final String? body;
+  final String? payload;
+}
+
+class FirebaseApi {
+  void getLetter() => print('a and b');
+  BuildContext? context;
+  final _firebaseMessaging = FirebaseMessaging.instance;
+
+  final StreamController<ReceivedNotification>
+      didReceiveLocalNotificationStream =
+      StreamController<ReceivedNotification>.broadcast();
+
+  final List<DarwinNotificationCategory> darwinNotificationCategories =
+      <DarwinNotificationCategory>[
+    DarwinNotificationCategory(
+      darwinNotificationCategoryText,
+      actions: <DarwinNotificationAction>[
+        DarwinNotificationAction.text(
+          'text_1',
+          'Action 1',
+          buttonTitle: 'Send',
+          placeholder: 'Placeholder',
+        ),
+      ],
+    ),
+    DarwinNotificationCategory(
+      darwinNotificationCategoryPlain,
+      actions: <DarwinNotificationAction>[
+        DarwinNotificationAction.plain('id_1', 'Action 1'),
+        DarwinNotificationAction.plain(
+          'id_2',
+          'Action 2 (destructive)',
+          options: <DarwinNotificationActionOption>{
+            DarwinNotificationActionOption.destructive,
+          },
+        ),
+        DarwinNotificationAction.plain(
+          navigationActionId,
+          'Action 3 (foreground)',
+          options: <DarwinNotificationActionOption>{
+            DarwinNotificationActionOption.foreground,
+          },
+        ),
+        DarwinNotificationAction.plain(
+          'id_4',
+          'Action 4 (auth required)',
+          options: <DarwinNotificationActionOption>{
+            DarwinNotificationActionOption.authenticationRequired,
+          },
+        ),
+      ],
+      options: <DarwinNotificationCategoryOption>{
+        DarwinNotificationCategoryOption.hiddenPreviewShowTitle,
+      },
+    )
+  ];
+  final _androidChannel = const AndroidNotificationChannel(
+      'high_importance_channel', "High Importance Notification",
+      description: 'This channel is used for important notification',
+      importance: Importance.defaultImportance);
+
+  final _localNotifications = FlutterLocalNotificationsPlugin();
+
+  void handleMessage(RemoteMessage? message) {
+    print("Ini pesan $message");
+    if (message == null) {
+      print("Pesan kosong $message");
+      return;
+    }
+    var title = message.notification?.title;
+    var body = message.notification?.body;
+    var slug = message.data?['slug'];
+    try {
+      Article article = Article();
+      article.getDetailArtikel(context, slug);
+      print(slug);
+    } catch (e) {
+      showDialog(
+          context: this.context!,
+          builder: (context) => customDialog(
+                header: 'Gagal',
+                text: e.toString(),
+                type: 'warning',
+              ));
+    }
+  }
+
+  @pragma('vm:entry-point')
+  void notificationTapBackground(NotificationResponse notificationResponse) {
+    print("Testing");
+  }
+
+  Future initLocalNotifications() async {
+    const iOS = DarwinInitializationSettings();
+    final DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+      onDidReceiveLocalNotification:
+          (int id, String? title, String? body, String? payload) async {
+        didReceiveLocalNotificationStream.add(
+          ReceivedNotification(
+            id: id,
+            title: title,
+            body: body,
+            payload: payload,
+          ),
+        );
+      },
+      notificationCategories: darwinNotificationCategories,
+    );
+    const android = AndroidInitializationSettings("@mipmap/launcher_icon");
+    const settings = InitializationSettings(android: android, iOS: iOS);
+
+    await _localNotifications.initialize(settings,
+        onDidReceiveNotificationResponse:
+            (NotificationResponse notificationResponse) {
+      switch (notificationResponse.notificationResponseType) {
+        case NotificationResponseType.selectedNotification:
+          final message =
+              RemoteMessage.fromMap(jsonDecode(notificationResponse.payload!));
+          handleMessage(message);
+          break;
+        case NotificationResponseType.selectedNotificationAction:
+          if (notificationResponse.actionId == navigationActionId) {
+            final message = RemoteMessage.fromMap(
+                jsonDecode(notificationResponse.payload!));
+            handleMessage(message);
+          }
+          break;
+        default:
+      }
+    });
+    final platform = _localNotifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+  }
+
+  Future initPushNotifications() async {
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+            alert: true, badge: true, sound: true);
+
+    FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+    FirebaseMessaging.onBackgroundMessage(hendleBackgroundMessage);
+    FirebaseMessaging.onMessage.listen((message) {
+      final notification = message.notification;
+      if (notification == null) {
+        return;
+      }
+
+      _localNotifications.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+                _androidChannel.id, _androidChannel.name,
+                channelDescription: _androidChannel.description,
+                icon: "@mipmap/launcher_icon"),
+          ),
+          payload: jsonEncode(message.toMap()));
+    });
+  }
+
+  Future<void> initNotifications(context) async {
+    this.context = context;
+    await FirebaseMessaging.instance.subscribeToTopic('RIDHO');
+    await _firebaseMessaging.requestPermission();
+    final fCMToken = await _firebaseMessaging.getToken();
+    print('Token : $fCMToken');
+    initPushNotifications();
+    initLocalNotifications();
   }
 }
