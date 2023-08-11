@@ -1,10 +1,6 @@
 // ignore_for_file: dead_code, camel_case_types
 
-import 'dart:io';
-
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sandiwara/constant.dart';
@@ -14,7 +10,6 @@ import 'package:sandiwara/menu/homePage.dart';
 import 'package:sandiwara/menu/searchBerita.dart';
 import 'package:sandiwara/pages/loginPage.dart';
 import 'package:sandiwara/topBar.dart';
-import 'package:sandiwara/widgets/customDialog.dart';
 
 class bottomNavbar extends StatefulWidget {
   const bottomNavbar({super.key});

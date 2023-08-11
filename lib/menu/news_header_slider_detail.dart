@@ -14,6 +14,7 @@ import 'package:sandiwara/widgets/customTag.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 
 class headerSliderDetail extends StatefulWidget {
   final detailArticle? detail_article;
