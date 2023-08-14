@@ -43,6 +43,7 @@ class Helpers {
   }
 }
 
+@pragma('vm:entry-point')
 Future<void> hendleBackgroundMessage(RemoteMessage message) async {
   print("Title : ${message.notification?.title}");
   print("Body : ${message.notification?.body}");
@@ -68,6 +69,46 @@ class ReceivedNotification {
   final String? title;
   final String? body;
   final String? payload;
+}
+
+@pragma('vm:entry-point')
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  var message;
+  switch (notificationResponse.notificationResponseType) {
+    case NotificationResponseType.selectedNotification:
+      message =
+          RemoteMessage.fromMap(jsonDecode(notificationResponse.payload!));
+      break;
+    case NotificationResponseType.selectedNotificationAction:
+      if (notificationResponse.actionId == navigationActionId) {
+        message =
+            RemoteMessage.fromMap(jsonDecode(notificationResponse.payload!));
+      }
+      break;
+    default:
+  }
+
+  if (message == null) {
+    print("Pesan kosong $message");
+    return;
+  }
+  var title = message.notification?.title;
+  var body = message.notification?.body;
+  var slug = message.data?['slug'];
+  try {
+    Article article = Article();
+    article.getDetailArtikel(FirebaseApi().getContext(), slug);
+    print(slug);
+  } catch (e) {
+    showDialog(
+      context: FirebaseApi().getContext()!,
+      builder: (context) => customDialog(
+        header: 'Gagal',
+        text: e.toString(),
+        type: 'warning',
+      ),
+    );
+  }
 }
 
 class FirebaseApi {
@@ -129,9 +170,11 @@ class FirebaseApi {
       importance: Importance.defaultImportance);
 
   final _localNotifications = FlutterLocalNotificationsPlugin();
+  BuildContext? getContext() {
+    return context;
+  }
 
   void handleMessage(RemoteMessage? message) {
-    print("Ini pesan $message");
     if (message == null) {
       print("Pesan kosong $message");
       return;
@@ -145,18 +188,14 @@ class FirebaseApi {
       print(slug);
     } catch (e) {
       showDialog(
-          context: this.context!,
-          builder: (context) => customDialog(
-                header: 'Gagal',
-                text: e.toString(),
-                type: 'warning',
-              ));
+        context: this.context!,
+        builder: (context) => customDialog(
+          header: 'Gagal',
+          text: e.toString(),
+          type: 'warning',
+        ),
+      );
     }
-  }
-
-  @pragma('vm:entry-point')
-  void notificationTapBackground(NotificationResponse notificationResponse) {
-    print("Testing");
   }
 
   Future initLocalNotifications() async {
@@ -200,7 +239,7 @@ class FirebaseApi {
           break;
         default:
       }
-    });
+    }, onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
     final platform = _localNotifications.resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
   }
@@ -211,9 +250,8 @@ class FirebaseApi {
             alert: true, badge: true, sound: true);
 
     FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
-    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
-    FirebaseMessaging.onBackgroundMessage(hendleBackgroundMessage);
     FirebaseMessaging.onMessage.listen((message) {
+      print("Pesan on message listen ${message}");
       final notification = message.notification;
       if (notification == null) {
         return;
@@ -231,6 +269,8 @@ class FirebaseApi {
           ),
           payload: jsonEncode(message.toMap()));
     });
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+    FirebaseMessaging.onBackgroundMessage(hendleBackgroundMessage);
   }
 
   Future<void> initNotifications(context) async {

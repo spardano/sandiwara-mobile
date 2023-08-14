@@ -55,7 +55,6 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   cached_network_image: ^3.2.3
   device_info_plus: ^9.0.2
-  connectivity_plus: ^4.0.1
   flutter_profile_picture: ^2.0.0
   image_picker: ^1.0.2
   image_cropper: ^4.0.1
