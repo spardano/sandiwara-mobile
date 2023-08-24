@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -83,6 +84,11 @@ class ProfileController extends GetxController {
 
       if (user.push_notif != null) {
         var numberStatus = statusNotification == true ? 1 : 0;
+        if (numberStatus == 1) {
+          await FirebaseMessaging.instance.subscribeToTopic('SANDIWARA');
+        } else {
+          await FirebaseMessaging.instance.unsubscribeFromTopic('SANDIWARA');
+        }
         user.push_notif = numberStatus;
 
         final updateMyData = userData.encode(user);

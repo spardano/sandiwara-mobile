@@ -35,6 +35,7 @@ Future<void> main() async {
       startLocale: const Locale('id', 'ID'),
       path: 'lib/Screen/Integration/Language_Integration/language',
       child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: MyApp(),
       ),
     ),

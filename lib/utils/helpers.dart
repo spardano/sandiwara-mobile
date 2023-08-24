@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,6 +12,8 @@ import 'package:sandiwara/constant.dart';
 import 'package:sandiwara/main.dart';
 import 'package:sandiwara/providers/article.dart';
 import 'package:sandiwara/widgets/customDialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sandiwara/models/user_data.dart';
 
 class Helpers {
   showAlertDialog(BuildContext context, String text) {
@@ -275,7 +278,22 @@ class FirebaseApi {
 
   Future<void> initNotifications(context) async {
     this.context = context;
-    await FirebaseMessaging.instance.subscribeToTopic('RIDHO');
+    final bridge = await SharedPreferences.getInstance();
+    if (bridge.containsKey('user') && bridge.getString('user') != null) {
+      final user =
+          jsonDecode(bridge.getString('user')!) as Map<String, dynamic>;
+
+      userData dataUser = userData.fromJson(user);
+      if (dataUser.push_notif == 1 || dataUser.push_notif == true) {
+        await FirebaseMessaging.instance.subscribeToTopic('SANDIWARA');
+      } else {
+        log("Unsubscribe");
+        await FirebaseMessaging.instance.unsubscribeFromTopic('SANDIWARA');
+      }
+    } else {
+      log("Testing");
+      await FirebaseMessaging.instance.subscribeToTopic('SANDIWARA');
+    }
     await _firebaseMessaging.requestPermission();
     final fCMToken = await _firebaseMessaging.getToken();
     print('Token : $fCMToken');

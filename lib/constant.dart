@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-const String apiUrl = 'http://192.168.100.38:8000/api';
-const String mainUrl = 'http://192.168.100.38:8000';
-// const String apiUrl = 'https://sandiwara.id/api';
-// const String mainUrl = 'https://sandiwara.id';
+// const String apiUrl = 'http://192.168.100.38:8000/api';
+// const String mainUrl = 'http://192.168.100.38:8000';
+const String apiUrl = 'https://sandiwara.id/api';
+const String mainUrl = 'https://sandiwara.id';
 
 InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
   crossPlatform: InAppWebViewOptions(
