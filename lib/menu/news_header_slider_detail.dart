@@ -42,7 +42,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
   String token = '';
   String? profile_picture;
   int id_user = 0;
-
+  
   @override
   void initState() {
     super.initState();
@@ -62,6 +62,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
       final user = jsonDecode(bridge.getString('user')!);
       id_user = int.parse(user['id']);
       profile_picture = user['profile_picture'];
+      print(profile_picture);
     }
   }
 
@@ -290,21 +291,20 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                                 withBorder: false,
                                 formKey: formKey,
                                 commentController: commentController,
-                                sendButtonMethod: () async {
+                                sendButtonMethod: () async{
                                   if (isAuthenticated) {
                                     if (formKey.currentState!.validate()) {
-                                      await Provider.of<Article>(context,
-                                              listen: false)
-                                          .saveComment(
-                                              id_user,
-                                              detail_article!.id!,
-                                              commentController.text,
-                                              token);
+  
+                                      var response = await commentControllerX.saveComment(id_user, detail_article!.id!, commentController.text, token);
 
-                                      Navigator.of(context).pop();
-                                      setState(() {
-                                        getComments();
-                                      });
+                                      if(response){
+                                        Navigator.of(context).pop();
+                                        setState(() {
+                                          print('update comment');
+                                          getComments();
+                                        });
+                                      }
+  
                                       commentController.clear();
                                       FocusScope.of(context).unfocus();
                                     } else {}

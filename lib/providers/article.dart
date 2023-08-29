@@ -58,15 +58,6 @@ class Article with ChangeNotifier {
     } catch (e) {}
   }
 
-  saveComment(
-      int id_user, String? id_article, String text, String token) async {
-    try {
-      var response = await http.post(Uri.parse('$apiUrl/auth/store-comment'),
-          headers: {'Authorization': token},
-          body: {'message': text, 'id_article': id_article});
-    } catch (e) {}
-  }
-
   Future<List<commentArticle>> getComments(int id_article) async {
     List<commentArticle> commentList = [];
     try {

@@ -31,4 +31,26 @@ class CommentController extends GetxController {
       print(e.toString());
     }
   }
-}
+
+
+  Future saveComment<boolean> (
+      int id_user, String? id_article, String text, String token) async {
+    try {
+      var response = await http.post(Uri.parse('$apiUrl/auth/store-comment'),
+          headers: {'Authorization': token},
+          body: {'message': text, 'id_article': id_article});
+
+      if(response.statusCode == 200){
+        return true;
+      }else{
+        return false;
+      }
+
+    } catch (e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+
+} 
