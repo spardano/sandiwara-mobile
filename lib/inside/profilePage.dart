@@ -112,7 +112,7 @@ class _profilePageState extends State<profilePage> {
                       nama: widget.userDataStorage.name.toString(),
                       profile_picture: widget.userDataStorage.profile_picture !=
                               null
-                          ? '$mainUrl/storage${widget.userDataStorage.profile_picture}'
+                          ? '$mainUrl/storage/${widget.userDataStorage.profile_picture}'
                           : 'https://sandiwara.id/images/avatar.png',
                     ),
                     PanelProfile(
@@ -400,6 +400,7 @@ class _CardProfileState extends State<CardProfile> {
                   width: 70,
                   child: Stack(fit: StackFit.expand, children: <Widget>[
                     Obx(() {
+                      devtools.log(widget.profile_picture);
                       if (profileController.isLoading.value) {
                         return CircleAvatar(
                           backgroundImage: NetworkImage(widget.profile_picture),
@@ -409,6 +410,8 @@ class _CardProfileState extends State<CardProfile> {
                           ),
                         );
                       } else {
+                        devtools
+                            .log('imageUrl : ' + profileController.imageUrl);
                         if (profileController.imageUrl.length != 0) {
                           return CachedNetworkImage(
                             imageUrl: profileController.imageUrl,
@@ -427,13 +430,22 @@ class _CardProfileState extends State<CardProfile> {
                                 ),
                               ),
                             ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
+                            errorWidget: (context, url, error) => CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('assets/images/avatar.png')),
                           );
                         } else {
-                          return CircleAvatar(
-                            backgroundImage:
-                                NetworkImage(widget.profile_picture),
+                          return CachedNetworkImage(
+                            imageUrl: widget.profile_picture,
+                            fit: BoxFit.cover,
+                            imageBuilder: (context, imageProvider) =>
+                                CircleAvatar(
+                              backgroundColor: Colors.white,
+                              backgroundImage: imageProvider,
+                            ),
+                            errorWidget: (context, url, error) => CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('assets/images/avatar.png')),
                           );
                         }
                       }

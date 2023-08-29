@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,11 +43,43 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyC6QEWW5kTmxs6w6r0oXwWNdbHKwpdlgJ0',
+    appId: '1:502775703033:web:058a1440542d5068db8928',
+    messagingSenderId: '502775703033',
+    projectId: 'sandiwara-4e1cd',
+    authDomain: 'sandiwara-4e1cd.firebaseapp.com',
+    storageBucket: 'sandiwara-4e1cd.appspot.com',
+    measurementId: 'G-BC07PWZT1J',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyB_wb-unila_qKuVNYMQWjFV455DBFKLqQ',
     appId: '1:502775703033:android:6c9b9ff8141bb9dedb8928',
     messagingSenderId: '502775703033',
     projectId: 'sandiwara-4e1cd',
     storageBucket: 'sandiwara-4e1cd.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDZA8PFG7byluOy5x60IN1Qzdqlty5zaG8',
+    appId: '1:502775703033:ios:af0acfed658b5677db8928',
+    messagingSenderId: '502775703033',
+    projectId: 'sandiwara-4e1cd',
+    storageBucket: 'sandiwara-4e1cd.appspot.com',
+    androidClientId: '502775703033-4sr57533fchkh99j2enocde8v9mbnf5c.apps.googleusercontent.com',
+    iosClientId: '502775703033-chm7bva1vivu6ocl42vq980ut402uslf.apps.googleusercontent.com',
+    iosBundleId: 'ai.squad.sandiwara',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyDZA8PFG7byluOy5x60IN1Qzdqlty5zaG8',
+    appId: '1:502775703033:ios:358794aad10e947edb8928',
+    messagingSenderId: '502775703033',
+    projectId: 'sandiwara-4e1cd',
+    storageBucket: 'sandiwara-4e1cd.appspot.com',
+    androidClientId: '502775703033-4sr57533fchkh99j2enocde8v9mbnf5c.apps.googleusercontent.com',
+    iosClientId: '502775703033-4de2u5b3f9cf7qg0jgjlk1t6oimmscig.apps.googleusercontent.com',
+    iosBundleId: 'com.example.sandiwara',
   );
 }

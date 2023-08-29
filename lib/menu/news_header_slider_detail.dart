@@ -3,8 +3,12 @@
 import 'dart:convert';
 import 'package:comment_box/comment/comment.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:sandiwara/components/article/comment_child.dart';
 import 'package:sandiwara/constant.dart';
+import 'package:sandiwara/controller/CommentController.dart';
+import 'package:sandiwara/main.dart';
 import 'package:sandiwara/menu/mySliverAppBar.dart';
 import 'package:sandiwara/models/commentArticle.dart';
 import 'package:sandiwara/models/detailArticle.dart';
@@ -28,6 +32,7 @@ class headerSliderDetail extends StatefulWidget {
 class _headerSliderDetailState extends State<headerSliderDetail> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController commentController = TextEditingController();
+  final CommentController commentControllerX = Get.put(CommentController());
   // late Future<List<commentArticle>> commentList;
   List<commentArticle>? commentList;
   detailArticle? detail_article;
@@ -35,6 +40,7 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
   bool isCommentListShow = false;
   bool isAuthenticated = false;
   String token = '';
+  String? profile_picture;
   int id_user = 0;
 
   @override
@@ -55,67 +61,12 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
     if (bridge.containsKey('user')) {
       final user = jsonDecode(bridge.getString('user')!);
       id_user = int.parse(user['id']);
+      profile_picture = user['profile_picture'];
     }
   }
 
   void getComments() async {
-    List<commentArticle> commentsData = [];
-    try {
-      var response = await http.post(
-          Uri.parse('$apiUrl/guest/comments-article'),
-          body: {'id_article': detail_article!.id!.toString()});
-
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body.toString());
-
-        for (Map<String, dynamic> item in data['data']) {
-          commentsData.add(commentArticle.fromJson(item));
-        }
-        commentList = commentsData;
-        isCommentListShow = true;
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  Widget commentChild(data) {
-    return ListView(
-      children: [
-        for (var item in commentList!)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(2.0, 8.0, 2.0, 0.0),
-            child: ListTile(
-              leading: GestureDetector(
-                onTap: () async {
-                  // print("Comment Clicked");
-                },
-                child: Container(
-                  height: 50.0,
-                  width: 50.0,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(50),
-                    ),
-                  ),
-                  child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: CommentBox.commentImageParser(
-                          imageURLorPath: "assets/images/avatar.png")),
-                ),
-              ),
-              title: Text(
-                item.nama_user!,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(item.message!),
-              trailing:
-                  Text(item.tanggal_comment!, style: TextStyle(fontSize: 10)),
-            ),
-          )
-      ],
-    );
+    commentList = await commentControllerX.getComments(detail_article!.id!);
   }
 
   @override
@@ -320,22 +271,29 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                               padding: const EdgeInsets.only(top: 30.0),
                               child: CommentBox(
                                 userImage: CommentBox.commentImageParser(
-                                    imageURLorPath: "assets/images/avatar.png"),
-                                child: isCommentListShow
-                                    ? commentChild(commentList)
-                                    : Padding(
-                                        padding: const EdgeInsets.all(10.0),
-                                        child: Text("Belum ada data komentar"),
-                                      ),
+                                    imageURLorPath: profile_picture != null
+                                        ? '$mainUrl/storage/$profile_picture'
+                                        : "assets/images/avatar.png"),
+                                child: Obx(() {
+                                  if (commentControllerX
+                                      .isCommentListShow.value) {
+                                    return commentChild(commentList);
+                                  } else {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Text("Belum ada data komentar"),
+                                    );
+                                  }
+                                }),
                                 labelText: 'Tulis Komentar...',
                                 errorText: 'Komentar tidak boleh kosong',
                                 withBorder: false,
                                 formKey: formKey,
                                 commentController: commentController,
-                                sendButtonMethod: () {
+                                sendButtonMethod: () async {
                                   if (isAuthenticated) {
                                     if (formKey.currentState!.validate()) {
-                                      Provider.of<Article>(context,
+                                      await Provider.of<Article>(context,
                                               listen: false)
                                           .saveComment(
                                               id_user,
@@ -343,16 +301,13 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                                               commentController.text,
                                               token);
 
-                                      Navigator.pop(context);
+                                      Navigator.of(context).pop();
                                       setState(() {
-                                        print('update comment');
                                         getComments();
                                       });
                                       commentController.clear();
                                       FocusScope.of(context).unfocus();
-                                    } else {
-                                      print("Not validated");
-                                    }
+                                    } else {}
                                   } else {
                                     showDialog(
                                         context: context,
@@ -374,7 +329,10 @@ class _headerSliderDetailState extends State<headerSliderDetail> {
                     });
               },
               backgroundColor: Colors.black87,
-              child: const Icon(Icons.comment),
+              child: const Icon(
+                Icons.comment,
+                color: Colors.white,
+              ),
             ),
           ),
         ));

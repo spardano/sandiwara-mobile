@@ -24,9 +24,6 @@ class Article with ChangeNotifier {
       var response = await http.post(Uri.parse('$apiUrl/guest/detail-article'),
           body: {'slug': slug.toString()});
 
-      print(
-          "${response.statusCode} article ${jsonDecode(response.body.toString())}");
-
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
         final detailArticle detail_article =
@@ -58,20 +55,16 @@ class Article with ChangeNotifier {
                   type: 'warning',
                 ));
       }
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
-  void saveComment(
+  saveComment(
       int id_user, String? id_article, String text, String token) async {
     try {
       var response = await http.post(Uri.parse('$apiUrl/auth/store-comment'),
           headers: {'Authorization': token},
           body: {'message': text, 'id_article': id_article});
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   Future<List<commentArticle>> getComments(int id_article) async {
@@ -83,19 +76,14 @@ class Article with ChangeNotifier {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
-        print('status comments :${data['status']}');
-
         for (Map<String, dynamic> item in data['data']) {
           commentList.add(commentArticle.fromJson(item));
-          print(item);
         }
-
         return commentList;
       } else {
         return commentList;
       }
     } catch (e) {
-      print(e.toString());
       return commentList;
     }
   }
