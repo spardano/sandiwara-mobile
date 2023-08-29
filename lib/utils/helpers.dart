@@ -185,10 +185,22 @@ class FirebaseApi {
     var title = message.notification?.title;
     var body = message.notification?.body;
     var slug = message.data?['slug'];
+    final notification = message.notification;
+
+    _localNotifications.show(
+        notification.hashCode,
+        title,
+        body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+              _androidChannel.id, _androidChannel.name,
+              channelDescription: _androidChannel.description,
+              icon: "@mipmap/launcher_icon"),
+        ),
+        payload: jsonEncode(message.toMap()));
     try {
       Article article = Article();
       article.getDetailArtikel(context, slug);
-      print(slug);
     } catch (e) {
       showDialog(
         context: this.context!,
