@@ -133,36 +133,36 @@ class FirebaseApi {
         ),
       ],
     ),
-    DarwinNotificationCategory(
-      darwinNotificationCategoryPlain,
-      actions: <DarwinNotificationAction>[
-        DarwinNotificationAction.plain('id_1', 'Action 1'),
-        DarwinNotificationAction.plain(
-          'id_2',
-          'Action 2 (destructive)',
-          options: <DarwinNotificationActionOption>{
-            DarwinNotificationActionOption.destructive,
-          },
-        ),
-        DarwinNotificationAction.plain(
-          navigationActionId,
-          'Action 3 (foreground)',
-          options: <DarwinNotificationActionOption>{
-            DarwinNotificationActionOption.foreground,
-          },
-        ),
-        DarwinNotificationAction.plain(
-          'id_4',
-          'Action 4 (auth required)',
-          options: <DarwinNotificationActionOption>{
-            DarwinNotificationActionOption.authenticationRequired,
-          },
-        ),
-      ],
-      options: <DarwinNotificationCategoryOption>{
-        DarwinNotificationCategoryOption.hiddenPreviewShowTitle,
-      },
-    )
+    // DarwinNotificationCategory(
+    //   darwinNotificationCategoryPlain,
+    //   actions: <DarwinNotificationAction>[
+    //     DarwinNotificationAction.plain('id_1', 'Action 1'),
+    //     DarwinNotificationAction.plain(
+    //       'id_2',
+    //       'Action 2 (destructive)',
+    //       options: <DarwinNotificationActionOption>{
+    //         DarwinNotificationActionOption.destructive,
+    //       },
+    //     ),
+    //     DarwinNotificationAction.plain(
+    //       navigationActionId,
+    //       'Action 3 (foreground)',
+    //       options: <DarwinNotificationActionOption>{
+    //         DarwinNotificationActionOption.foreground,
+    //       },
+    //     ),
+    //     DarwinNotificationAction.plain(
+    //       'id_4',
+    //       'Action 4 (auth required)',
+    //       options: <DarwinNotificationActionOption>{
+    //         DarwinNotificationActionOption.authenticationRequired,
+    //       },
+    //     ),
+    //   ],
+    //   options: <DarwinNotificationCategoryOption>{
+    //     DarwinNotificationCategoryOption.hiddenPreviewShowTitle,
+    //   },
+    // )
   ];
   final _androidChannel = const AndroidNotificationChannel(
       'high_importance_channel', "High Importance Notification",
@@ -199,25 +199,29 @@ class FirebaseApi {
   }
 
   Future initLocalNotifications() async {
-    const iOS = DarwinInitializationSettings();
-    final DarwinInitializationSettings initializationSettingsDarwin =
-        DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-      onDidReceiveLocalNotification:
-          (int id, String? title, String? body, String? payload) async {
-        didReceiveLocalNotificationStream.add(
-          ReceivedNotification(
-            id: id,
-            title: title,
-            body: body,
-            payload: payload,
-          ),
-        );
-      },
-      notificationCategories: darwinNotificationCategories,
+    const iOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
+    // const DarwinInitializationSettings initializationSettingsDarwin =
+    //     DarwinInitializationSettings(
+    //   requestAlertPermission: true,
+    //   requestBadgePermission: true,
+    //   requestSoundPermission: true,
+      // onDidReceiveLocalNotification:
+      //     (int id, String? title, String? body, String? payload) async {
+      //   didReceiveLocalNotificationStream.add(
+      //     ReceivedNotification(
+      //       id: id,
+      //       title: title,
+      //       body: body,
+      //       payload: payload,
+      //     ),
+      //   );
+      // },
+      // notificationCategories: darwinNotificationCategories,
+    // );
     const android = AndroidInitializationSettings("@mipmap/launcher_icon");
     const settings = InitializationSettings(android: android, iOS: iOS);
 
@@ -276,7 +280,11 @@ class FirebaseApi {
   Future<void> initNotifications(context) async {
     this.context = context;
     await FirebaseMessaging.instance.subscribeToTopic('RIDHO');
-    await _firebaseMessaging.requestPermission();
+    await _firebaseMessaging.requestPermission(
+      alert: true, announcement: false,
+      badge: true,
+      carPlay: false, criticalAlert: false, provisional: false, sound: true
+    );
     final fCMToken = await _firebaseMessaging.getToken();
     print('Token : $fCMToken');
     initPushNotifications();

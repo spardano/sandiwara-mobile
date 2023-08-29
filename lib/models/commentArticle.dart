@@ -7,6 +7,7 @@ class commentArticle {
     this.balasan,
     this.tanggal_balas,
     this.tanggal_comment,
+    this.profile_picture,
   });
 
   final int? id;
@@ -16,6 +17,7 @@ class commentArticle {
   final String? balasan;
   final String? tanggal_balas;
   final String? tanggal_comment;
+  var profile_picture;
 
   factory commentArticle.fromJson(Map<String, dynamic> json) => commentArticle(
       id: json["id"] == null ? null : json["id"],
@@ -26,5 +28,7 @@ class commentArticle {
       tanggal_balas:
           json["tanggal_balas"] == null ? null : json["tanggal_balas"],
       tanggal_comment:
-          json["tanggal_comment"] == null ? null : json["tanggal_comment"]);
+          json["tanggal_comment"] == null ? null : json["tanggal_comment"],
+      profile_picture: json['profile_picture'] == null ? null : json['profile_picture']);
+      
 }

@@ -25,7 +25,7 @@ Future<void> main() async {
   await Future.delayed(const Duration(seconds: 3));
   FlutterNativeSplash.remove();
 
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   await EasyLocalization.ensureInitialized();
 
@@ -49,8 +49,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // final Connectivity _connectivity = Connectivity();
-  // late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
